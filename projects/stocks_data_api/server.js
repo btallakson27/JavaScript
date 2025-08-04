@@ -15,7 +15,7 @@ async function scrapeData(){
 
         const $ = cheerio.load(html) // loads the HTML content into Cheerio, allowing you to use jQuery-style syntax to search and extract elements from the HTML.
         const price_history=getPrices($)
-        console.log($.html())
+        console.log(price_history)
 
     } catch (err){
         console.log(err.message)
