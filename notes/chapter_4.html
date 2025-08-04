@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM Manipulation Practice</title>
+
+</head>
+
+<body>
+
+    <h1 id="main-title">DOM Manipulation</h1>
+
+    <form id="form-example" onsubmit="return handleSubmitForm(event)"> <!--add return after you did everything else below.-->
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name"><br><br>
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <button id="open-modal-btn">Open Modal</button>
+
+    <div id="content-area"></div> 
+
+    <textarea id="text-area" rows="4" cols="50">Type some text...</textarea>
+
+    <div id="modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Some text in the Modal..</p>
+            <button id="close-modal-btn">Close Modal</button> <!--an id must be unique-->
+        </div>
+    </div>
+    <script> // script allows you to code JS in an HTML doc
+        let modalBtn = document.getElementById('open-modal-btn') // document is the class/object and getElementByID is a method. a method is a function 
+        //inside of an object or a class. passing in the string of 'open-modal-btn' allows us to do things with the button in JS.
+        let closeModalBtn = document.getElementById('close-modal-btn')
+        let modal = document.getElementById('modal') // what's a modal? this helps the modal to actually open.
+        let xBtn = document.querySelector('.close') //querySelector allows us to pass in a CSS selector to select the button. close is a class.
+        let textArea = document.getElementById('text-area')
+        let nameInput = document.getElementById('name')
+        let ageInput = document.getElementById('age')
+
+        let contentArea = document.getElementById('content-area')
+
+        contentArea.innerHTML = '<h1>Hi mom!</h1>' //since this isn't a function assigned to an event, it happens on page load. 
+        let newHTML =  document.querySelector('#content-area h1') //query selector helps you find HTML elements. this is saying
+        //find the first HTML element that has the id (# = id) of content-area and the h1 within it. 
+        newHTML.style.background='red'
+        newHTML.style.color='lightgreen'
+        newHTML.style.padding='20px'
+        newHTML.style.width='150px'
+
+        function handleOpenModal() {
+            console.log(textArea.value) //value here allows you to see what was typed in the box in the Console
+            modal.style.display ='flex' //style helps you interact with the styles. and makes the text from the p tag above
+            //appear under the box when you click the Open Modal button.
+            textArea.value='hi mom' // this will change what appears in the box. 
+        }
+
+        modalBtn.addEventListener ('click', handleOpenModal) //addEventListener tells the HTML element to listen for a particular event.
+        // in this case 'click' is what it's lsitening for. When this happens it will do whatever the function handleOpenModal
+        // is telling it to do, in this case, change the text to 'button is working'
+
+        function handleCloseModal() {
+            modal.style.display ='none'
+        }
+
+        closeModalBtn.addEventListener('click', handleCloseModal) //we first defined this variable of close Modal Btn above. 
+        xBtn.addEventListener('click', handleCloseModal)
+        
+        function handleSubmitForm(event) { // we can access the event like this
+            event.preventDefault() //preventing because defualt is to refresh the page. in order for this to work properly
+            //you must also add (event) above after handleSubmitForm.
+            console.log('name: ', nameInput.value) //this will allow the actual name someone types in to appear in the console. same goes for age below. 
+            console.log('age: ', ageInput.value)
+        }
+
+    </script>
+</body>
+
+</html>

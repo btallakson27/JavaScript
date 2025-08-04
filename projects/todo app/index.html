@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Press+Start+2P&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            color: #202124;
+        }
+
+        h1,
+        h2,
+        h3,
+        input,
+        button {
+            font-family: 'Press Start 2P', system-ui;
+        }
+
+        body {
+            /* min-height: 100vh; */
+            display: flex;
+            flex-direction: column;
+            padding: 14px;
+            background: #eff6ff;
+            gap: 14px;
+        }
+
+        header {
+            display: flex;
+            align-items: stretch;
+        }
+
+        header,
+        main {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            gap: 14px;
+        }
+
+        header input {
+            flex: 1;
+            border-radius: 14px;
+            outline: none;
+            width: 100%;
+        }
+
+        header button {
+            border-radius: 14px;
+            background: transparent;
+            transition-duration: 200ms;
+            cursor: pointer;
+        }
+
+        header button:hover {
+            opacity: 0.7;
+        }
+
+        header button,
+        header input {
+            padding: 14px 18px;
+            border: none;
+            outline: none;
+            background: white;
+        }
+
+        p {
+            font-size: 0.9em;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .todoItem {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+            border-radius: 14px;
+            background: white;
+        }
+
+        .todoItem p {
+            flex: 1;
+        }
+
+        .actionsContainer {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .actionsContainer button {
+            transition-duration: 200ms;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .actionsContainer button:hover {
+            opacity: 0.7;
+        }
+
+
+
+        @media (min-width: 640px) {
+
+            header button,
+            header input {
+                font-size: 1.2em;
+            }
+
+            p {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <input id="todoInput" placeholder="Enter todo ..." />
+        <button id="addBtn">Add</button>
+    </header>
+    <main>
+        <div class="todoItem">
+            <p>Go to the gym</p>
+            <div class="actionsContainer">
+                <button><i class="fa-solid fa-pen-to-square"></i></button>
+                <button><i class="fa-solid fa-trash"></i></button>
+            </div>
+        </div>
+    </main>
+    <script>
+        // I can write javascript in here
+        // 1. initialize todo list and write a function to show them
+
+        let mainContainer = document.querySelector('main') // will be the section where to-do items are displayed.
+        let addBtn = document.getElementById('addBtn')
+        let todoInput = document.getElementById('todoInput')
+        let todo_list = localStorage.getItem('todo-list') ? // Translates to, "is there a string saved under the key 'todo-list' in the localStorage?" ? "if so, parse the saved JSON string into a JavaScript object. Then accesses the .todo_list property of that object.
+        JSON.parse(localStorage.getItem('todo-list')).todo_list : [] // if nothing was found (i.e. it returns null), then it defaults to an empty array: []
+
+        function paintUI() {
+            let new_inner_html = '' // This initializes an empty string. Then, inside the for loop, the string is incrementally built by adding HTML for each to-do item. Think of new_inner_html like a blank canvas 🖼️. With each loop, you’re painting a part of the picture. When the loop finishes, you hang the completed artwork on the wall (mainContainer.innerHTML = ...).
+            for (let i = 0; i < todo_list.length; i++) { // pasting this div adds onto our string an entire div for every todo that we have in the item. change the p tag in it so it updates with each todo you add, buttons and all.
+                const todo = todo_list[i]
+                new_inner_html += ` <!--Each loop iteration adds (+=) a new block of HTML to new_inner_html for a single item in the todo_list.-->
+                <div class="todoItem">
+                    <p>${todo}</p>
+                    <div class="actionsContainer">
+                        <button class="editBtn" data-index="${i}"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="trashBtn" data-index="${i}"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+                `
+            }
+            mainContainer.innerHTML = new_inner_html // After the loop finishes, new_inner_html contains the full HTML structure for all to-do items. That string is then set as the contents of the <main> element.
+        }
+        saveData() // Finally, it calls saveData() — presumably a function defined elsewhere to store the list (maybe in localStorage).
+        
+        // 2. write a function to add todos
+
+        function addTodo() {
+            let current_todo = todoInput.value // assign the variable 'current_todo' to the value typed in the input bar
+            if (!current_todo) { return } // if the input bar is empty, exit the function
+
+            todo_list.push(current_todo) // push the current todo into the todo_list
+            todoInput.value = '' // clears the value of the input after the todo has been added
+            paintUI() // then run the paintUI function to put this new item in the list 
+        }
+
+        addBtn.addEventListener('click', addTodo)
+
+        // 3. write a function to delete todos
+
+        function deleteTodo(index) { // this index represents the position in the list of all of the item to be deleted. this needs an onclick attribute added to the button in the html above because you need to access it at it's index.
+            let new_todo_list = todo_list.filter((current_value, current_index) => { // creates a new array that loops through each item in the todo_list
+                return current_index !== index // tells .filter to keep (return) any item whose index is not equal to the one we want to delete. it excludes the item in the given index.
+            })
+
+            todo_list = new_todo_list // after filtering out the unwanted item, it replaces the original todo_list with the new filtered one.
+            paintUI() // updates the UI
+        }
+
+        // 4. write a function to edit todos
+
+        function editTodo(index) { //this needs an onclick attribute added to the button in the html above because you need to access it at it's index.
+            let current_todo = todo_list[index]
+            todoInput.value = current_todo
+            deleteTodo(index)
+        }
+
+        // 5. write a function that saves all of the information so it's not lost when refreshing the page
+
+        function saveData() {
+            localStorage.setItem('todo-list', JSON.stringify // whenever we call saveData, it's going to save our todo list, under the title 'todo-list' to our local storage. localStorage is a built-in web API that lets you store data in the browser — specifically in key-value pairs — that persists even after the page is reloaded or the browser is closed.
+            ({ todo_list })) // { todo_list } is shorthand syntax for: { todo_list: todo_list } So it creates an object where the key is 'todo_list' and the value is whatever variable named todo_list currently holds (likely an array of to-do items). JSON.stringify(...) turns that object into a JSON-formatted string so it can be stored in localStorage.
+        }
+
+
+    </script>
+</body>
+
+</html>
