@@ -31,4 +31,22 @@ async function getHistoricalPrices(){
     }
 }
 
-getHistoricalPrices()
+// 4. initialize server that serves up an html file that the user can play with
+
+const express = require('express')
+const app=express()
+const port = 8383 // the express server is serving the HTML file, index.html from your public folder. So whatever is in there 
+// will show when you go to your search bar and type "localhost:8383"
+
+// middleware
+app.use(express.json())
+app.use(require('cors')())
+app.use(express.static('public'))
+
+app.listen(port, ()=>{console.log(`Server hsa started on port: ${port}`)})
+
+app.get('/', (req, res) => {
+  res.send('Server is working!')  
+})
+
+// 5. define api endpoints to access stock data
