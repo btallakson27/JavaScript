@@ -3,8 +3,11 @@ const stockTicker='MRNA'
 const range= '1mo' // how far back you want to look.
 const interval = '1d' // how often you want data points.
 
-const url = `https://query1.finance.yahoo.com/v8/finance/chart/${stockTicker}?range=${range}&interval=${interval}`; 
-// builds the full Yahoo Finance API URL. where do I get this?
+const url = `https://query1.finance.yahoo.com/v8/finance/chart/${stockTicker}?range=${range}&interval=${interval}`; // find url (directions in how to folder).
+// next you must add the template literal strings. The ?, = and & are part of a query string. ? starts the query string, so it separates the base url from the parameters.
+// the = assigns a value to a key. but you already set these values above, so do you really need to do them again? YES! And here's why. These variables live inside your code,
+// but the Yahoo API doesn’t know what your variables are. It only sees the final URL string
+// the & separates multiple parameters, so you use it to chain additional key-value pairs. 
 
 // 2. Fetch and process the data
 
