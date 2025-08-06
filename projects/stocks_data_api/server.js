@@ -1,7 +1,7 @@
 // 1. Define stock ticker and API URL
-const stockTicker='MRNA'
-const range= '1mo' // how far back you want to look.
-const interval = '1d' // how often you want data points.
+const stockTicker='MRNA' // stock symbol for Moderna.
+const range= '1mo' // the time range.
+const interval = '1d' // the interval (daily closing prices)
 
 const url = `https://query1.finance.yahoo.com/v8/finance/chart/${stockTicker}?range=${range}&interval=${interval}`; // find url (directions in how to folder).
 // next you must add the template literal strings. The ?, = and & are part of a query string. ? starts the query string, so it separates the base url from the parameters.
@@ -13,10 +13,13 @@ const url = `https://query1.finance.yahoo.com/v8/finance/chart/${stockTicker}?ra
 
 async function getHistoricalPrices(){
     try{
-        const res=await fetch(url) // fetches the stock data from the url.
-        const data= await res.json() // parses the response from JSON.
-        console.log(JSON.stringify(data, null, 2)) // converts the object to a pretty-printed string with indentation.
-        // This makes nested objects and arrays easier to read.
+        const res=await fetch(url) // gets the stock data from the url/internet.
+        const data= await res.json() // parses the response from JSON into a usable JavaScript object. 
+        console.log(JSON.stringify(data, null, 2)) // converts the object to a pretty-printed string with indentation. 
+        // This makes nested objects and arrays easier to read. uses JSON.stringify to convert to a readable JSON string. 
+        // Here'a what each parameter means. (value, replacer, space) value: The JavaScript object you want to turn into a JSON string.
+        // replacer: (Optional) Lets you filter or modify what gets stringified. null = don’t filter anything.
+        // space: (Optional) Adds indentation — 2 spaces in this case — for better readability.
 
         // all 3 of the following lines are extracting specific parts of the JSON response returned by the Yahoo Finance API.
         const result=data.chart.result[0] 
