@@ -1,19 +1,34 @@
 // 1. Define stock ticker and API URL
 const stockTicker='MRNA'
-const range= '1mo'
-const interval = '1d'
+const range= '1mo' // how far back you want to look.
+const interval = '1d' // how often you want data points.
 
-const url = `https://query1.finance.yahoo.com/v8/finance/chart/${stockTicker}?range=${range}&interval=${interval}`;
+const url = `https://query1.finance.yahoo.com/v8/finance/chart/${stockTicker}?range=${range}&interval=${interval}`; 
+// builds the full Yahoo Finance API URL. where do I get this?
 
 // 2. Fetch and process the data
+
 async function getHistoricalPrices(){
     try{
-        const res=await fetch(url)
-        const data= await res.json()
+        const res=await fetch(url) // fetches the stock data from the url.
+        const data= await res.json() // parses the response from JSON.
+        console.log(JSON.stringify(data, null, 2)) // converts the object to a pretty-printed string with indentation.
+        // This makes nested objects and arrays easier to read.
 
-        const result=data.chart.result[0]
-        const timestamps=result.timestamp
-        const prices = result.indicators.quote[0].close
+        // all 3 of the following lines are extracting specific parts of the JSON response returned by the Yahoo Finance API.
+        const result=data.chart.result[0] 
+        // data.chart.result is an array. [0] means you're accessing the first element of that array. but the first thing inside it is "meta", not "timestamp". 
+        // So why does the original code work when it says "result.timestamp"? Because there's more in the object than just "meta".
+        // You're only seeing the beginning of the object printed, ie. the top of result[0]. The full structure continues down and includes more keys like "timestamp" and "indicators".
+        // data is the full JSON response from the API. 
+        // data.chart accesses the "chart" key.
+        // data.chart.result[0] grabs that single object.
+        // We assign it to a variable called result so we can use it more easily.
+        // Now result contains all the useful stock data.
+
+        // when it comes to all the notes for const result=data.chart.result[0] above, it starts with knowing that here you will need to access the timestamp and indicators.
+        const timestamps=result.timestamp 
+        const prices = result.indicators.quote[0].close // 
 
         //3. Combine and print dates with closing prices
         const formatted=timestamps.map((ts,i)=>{
@@ -50,3 +65,5 @@ app.get('/', (req, res) => {
 })
 
 // 5. define api endpoints to access stock data
+
+getHistoricalPrices()
