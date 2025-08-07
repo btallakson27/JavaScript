@@ -14,7 +14,10 @@ const url = `https://query1.finance.yahoo.com/v8/finance/chart/${stockTicker}?ra
 async function getHistoricalPrices(){
     try{
         const res=await fetch(url) // gets the stock data from the url/internet.
-        const data= await res.json() // parses the response from JSON into a usable JavaScript object. 
+        const data= await res.json() // This parses the raw JSON body and gives you a regular JavaScript object so you can work with it in your code.
+        //The res object you get from fetch() is a special Response object, not raw JSON or a usable JS object by default, which is why you need to do this,
+        // then immediately turn it into a usable JSON object in the next line of code below.
+        
         // const data await JSON.parse(res) is incorrect and will not do the same thing, and here's why.
         //res is a Response object from fetch(). .json() is a built-in method of the Response object that: Reads the body stream, Parses it as JSON, 
         //and returns the result as a JavaScript object. This is the standard and correct way to get JSON from a response. 
