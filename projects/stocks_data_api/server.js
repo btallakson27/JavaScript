@@ -24,11 +24,9 @@ async function getHistoricalPrices(){
         // on the other hand, const data = await JSON.parse(res) is incorrect because res is a Response object, not a JSON string.
         // JSON.parse() expects a JSON-formatted string, not a Response object. Bottom line: always use const data= await res.json() when working with fetch() and JSON APIs.
         
-        console.log(JSON.stringify(data, null, 2)) // converts the object to a pretty-printed string with indentation. 
-        // This makes nested objects and arrays easier to read. uses JSON.stringify to convert to a readable JSON string. 
-        // Here'a what each parameter means. (value, replacer, space) value: The JavaScript object you want to turn into a JSON string.
-        // replacer: (Optional) Lets you filter or modify what gets stringified. null = don’t filter anything.
-        // space: (Optional) Adds indentation — 2 spaces in this case — for better readability.
+        console.log(JSON.stringify(data, null, 2)) // If you console.log(data) directly, most environments will show it in a 
+        // collapsible object form, meaning it will not show all nested levels by default. You might see [object] or [array =] placeholders
+        // if the structure is deep. JSON.stringify on the other hand, shows it as a full raw JSON text, readable anywhere.
 
         // all 3 of the following lines are extracting specific parts of the JSON response returned by the Yahoo Finance API.
         const result=data.chart.result[0] 
