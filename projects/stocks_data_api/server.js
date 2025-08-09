@@ -3,10 +3,12 @@ const stockTicker='MRNA' // stock symbol for Moderna.
 const range= '1mo' // the time range.
 const interval = '1d' // the interval (daily closing prices)
 
-const url = `https://query1.finance.yahoo.com/v8/finance/chart/${stockTicker}?range=${range}&interval=${interval}`; // find url (directions in how to folder).
-// next you must add the template literal strings. The ?, = and & are part of a query string. ? starts the query string, so it separates the base url from the parameters.
-// the = assigns a value to a key. but you already set these values above, so do you really need to do them again? YES! And here's why. These variables live inside your code,
-// but the Yahoo API doesn’t know what your variables are. It only sees the final URL string
+const url = `https://query1.finance.yahoo.com/v8/finance/chart/${stockTicker}?range=${range}&interval=${interval}`;
+// by setting range=1mo and interval=1d in your URL, you asked for daily data. The API respects that request and outputs one timestamp per trading day.
+// this becomes especially useful when you want to find this specific info in JSON as you will see below.
+// find url (directions in how to folder). next you must add the template literal strings. The ?, = and & are part of a query string. ? starts the query string, 
+// so it separates the base url from the parameters. the = assigns a value to a key. but you already set these values above, so do you really need to do 
+// them again? YES! And here's why. These variables live inside your code, but the Yahoo API doesn’t know what your variables are. It only sees the final URL string
 // the & separates multiple parameters, so you use it to chain additional key-value pairs. 
 
 // 2. Fetch and process the data
