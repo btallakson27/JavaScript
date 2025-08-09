@@ -40,8 +40,8 @@ async function getHistoricalPrices(){
         // Now result contains all the useful stock data.
 
         // when it comes to all the notes for const result=data.chart.result[0] above, it starts with knowing that here you will need to access the timestamp and indicators.
-        const timestamps=result.timestamp 
-        const prices = result.indicators.quote[0].close // 
+        const timestamps=result.timestamp // you know to look for "timestamp because it is an array of Unix time values, one for each trading day.
+        const prices = result.indicators.quote[0].close // you know to look for "indicators" because it contains price-related arrays (open, close, high, low, volume).
 
         //3. Combine and print dates with closing prices
         const formatted=timestamps.map((ts,i)=>{
