@@ -44,7 +44,7 @@ async function getHistoricalPrices(){
         // when it comes to all the notes for const result=data.chart.result[0] above, it starts with knowing that here you will need to access the timestamp and indicators.
         const timestamps=result.timestamp // you know to look for "timestamp because it is an array of Unix time values, one for each trading day.
         const prices = result.indicators.quote[0].close // you know to look for "indicators" because it contains price-related arrays (open, close, high, low, volume).
-
+        // .close is indeed the array of closing prices for each time period in the chart data you got from Yahoo Finance’s API.
         //3. Combine and print dates with closing prices
         const formatted=timestamps.map((ts,i)=>{
             const date=new Date(ts * 1000).toISOString().split('T')[0]
