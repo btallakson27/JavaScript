@@ -48,8 +48,18 @@ async function getHistoricalPrices(){
         const timestamps=result.timestamp // you know to look for "timestamp because it is an array of Unix time values, one for each trading day.
         const prices = result.indicators.quote[0].close // you know to look for "indicators" because it contains price-related arrays (open, close, high, low, volume).
         // .close is indeed the array of closing prices for each time period in the chart data you got from Yahoo Finance’s API.
-        //3. Combine and print dates with closing prices
-        const formatted=timestamps.map((ts,i)=>{
+        
+        //3. Format the data.
+        const formatted=timestamps.map((ts,i)=>{ // this is a JavaScript array method at work, and it's doing a lot in a small space. timestamps is an array of Unix timestamps. 
+            // Example: [1720752000, 1720838400, 1720924800, ...] Each number represents a date in seconds since Jan 1, 1970 (UTC).
+            // .map() is an array method that:
+            // -Loops over every element in the array.
+            // -Runs the provided function for each element.
+            // -Creates a new array from the return values.
+            // If .forEach() is just “do something with each item,” .map() is “transform each item into something else and return a new array.”
+            // Inside .map() you can pass up to three parameters to the callback: (arrayElement, index, arrayItself) ts → the current timestamp value and i → the index in the array (0, 1, 2, …).
+            // We need i to pull the matching closing price from prices[i] because timestamps and prices are parallel arrays. timestamps[0] → prices[0]
+            // the .map() is basially saying: "For each timestamp (ts), at position i, make a new object that has a readable date from ts and the closing price from prices[i]."
             const date=new Date(ts * 1000).toISOString().split('T')[0]
             return {date,close:prices[i]}
         })
