@@ -57,10 +57,17 @@ async function getHistoricalPrices(){
             // -Runs the provided function for each element.
             // -Creates a new array from the return values.
             // If .forEach() is just “do something with each item,” .map() is “transform each item into something else and return a new array.”
-            // Inside .map() you can pass up to three parameters to the callback: (arrayElement, index, arrayItself) ts → the current timestamp value and i → the index in the array (0, 1, 2, …).
+            // Inside .map() you can pass up to three parameters to the callback: (arrayElement, index, arrayItself) ts → the current timestamp 
+            // value and i → the index in the array (0, 1, 2, …).
             // We need i to pull the matching closing price from prices[i] because timestamps and prices are parallel arrays. timestamps[0] → prices[0]
-            // the .map() is basially saying: "For each timestamp (ts), at position i, make a new object that has a readable date from ts and the closing price from prices[i]."
-            const date=new Date(ts * 1000).toISOString().split('T')[0]
+            // the .map() is basially saying: "For each timestamp (ts), at position i, make a new object that has a readable date from ts and the closing 
+            // price from prices[i]."
+            const date=new Date(ts * 1000).toISOString().split('T')[0] // for ts * 1000, Your ts value is a Unix timestamp in seconds, JavaScript’s Date 
+            // object expects milliseconds since Jan 1, 1970, so multiplying by 1000 converts seconds → milliseconds. new Date(...) Creates a Date object 
+            // from that timestamp. Now you have something like: Fri Aug 12 2022 00:00:00 GMT+0000 .toISOString() Converts the date into an ISO 8601 string 
+            // in UTC time, e.g.:"2022-08-12T00:00:00.000Z" .split('T') Splits that ISO string into two parts: ["2022-08-12", "00:00:00.000Z"] The 'T' is 
+            // the separator between the date and time in ISO format. [0] Takes the first part (just the date part): "2022-08-12"
+            // Result: date now contains just the date in YYYY-MM-DD format.
             return {date,close:prices[i]}
         })
 
