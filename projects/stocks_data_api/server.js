@@ -50,12 +50,11 @@ async function getHistoricalPrices(){
         // .close is indeed the array of closing prices for each time period in the chart data you got from Yahoo Finance’s API.
         
         //3. Format the data.
-        const formatted=timestamps.map((ts,i)=>{ // this is a JavaScript array method at work, and it's doing a lot in a small space. timestamps is an array of Unix timestamps. 
-            // Example: [1720752000, 1720838400, 1720924800, ...] Each number represents a date in seconds since Jan 1, 1970 (UTC).
-            // .map() is an array method that:
-            // -Loops over every element in the array.
-            // -Runs the provided function for each element.
-            // -Creates a new array from the return values.
+        const formatted=timestamps.map((ts,i)=>{ // this is a JavaScript array method at work, and it's doing a lot in a small space. 
+            // timestamps is an array of Unix timestamps. Example: [1720752000, 1720838400, 1720924800, ...] 
+            // Each number represents a date in seconds since Jan 1, 1970 (UTC).
+            // .map() is an array method that loops over every element in the array, runs the provided function for each element, and
+            // creates a new array from the return values.
             // If .forEach() is just “do something with each item,” .map() is “transform each item into something else and return a new array.”
             // Inside .map() you can pass up to three parameters to the callback: (arrayElement, index, arrayItself) ts → the current timestamp 
             // value and i → the index in the array (0, 1, 2, …).
