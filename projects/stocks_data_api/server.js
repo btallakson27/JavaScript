@@ -60,7 +60,9 @@ async function getHistoricalPrices(){
             // in UTC time, e.g.:"2022-08-12T00:00:00.000Z" .split('T') Splits that ISO string into two parts: ["2022-08-12", "00:00:00.000Z"] The 'T' is 
             // the separator between the date and time in ISO format. [0] Takes the first part (just the date part): "2022-08-12"
             // Result: date now contains just the date in YYYY-MM-DD format.
-            return {date,close:prices[i]}
+            return {date,close:prices[i]} // For each timestamp index i, you look up the corresponding closing price from the prices array.
+                // this line of code returns an object literal with two properties. 
+                // In JavaScript, { date, close: prices[i] } is shorthand for: { date: date, close: prices[i] }
         })
 
         console.log(`\n📈 Historical Closing Prices for ${stockTicker}:\n`)
