@@ -53,7 +53,8 @@ async function getHistoricalPrices(){
         const formatted=timestamps.map((ts,i)=>{ // map (loop over) each element in the array (timestamps) and pass in the parameters
                 // (ts,i) so for each timestamp (ts), at position i, make a new object that has a readable date from ts and the closing 
                 // price from prices[i]." this object is being returned below.
-            const date=new Date(ts * 1000).toISOString().split('T')[0] // for ts * 1000, Your ts value is a Unix timestamp in seconds, JavaScript’s Date 
+            const date=new Date(ts * 1000).toISOString().split('T')[0] // ts is just the name you gave to each element of the array during iteration.
+            // for ts * 1000, Your ts value is a Unix timestamp in seconds, JavaScript’s Date 
             // object expects milliseconds since Jan 1, 1970, so multiplying by 1000 converts seconds → milliseconds. new Date(...) Creates a Date object 
             // from that timestamp. Now you have something like: Fri Aug 12 2022 00:00:00 GMT+0000 .toISOString() Converts the date into an ISO 8601 string 
             // in UTC time, e.g.:"2022-08-12T00:00:00.000Z" .split('T') Splits that ISO string into two parts: ["2022-08-12", "00:00:00.000Z"] The 'T' is 
