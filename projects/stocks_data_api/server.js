@@ -66,6 +66,14 @@ async function getHistoricalPrices(){
         })
 
         console.log(`\n📈 Historical Closing Prices for ${stockTicker}:\n`)
+        // \n → adds a line break before and after the text, to make the console output look cleaner.
+        // 📈 → just an emoji to decorate the output.
+        // ${stockTicker} → string interpolation: inserts the value of the stockTicker variable (in your case "MRNA") into the string.
+        // example output -> 📈 Historical Closing Prices for MRNA:
+        // .forEach(...) loops through every object in that array.
+        // "entry" is a parameter name you chose, and it's part of an arrow function. 
+        // JavaScript calls your arrow function once for each element in the array.
+        // So entry is just a variable that represents the current array element while looping.
         formatted.forEach(entry=>{
             console.log(`${entry.date}: $${entry.close}`)
         })
