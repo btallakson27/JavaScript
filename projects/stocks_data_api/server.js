@@ -87,9 +87,9 @@ async function getHistoricalPrices(){
 
 const express = require('express') // This imports the Express library into your program. 
 // require('express') loads the Express module (a Node.js framework for building web servers).
-// Now, express is a function you can call to create an application. A web server is a program (and sometimes the physical 
-// machine it runs on) that listens for requests from clients (like your browser) and sends back responses (like web pages, 
-// data, or files).
+// A web server is a program (and sometimes the physical machine it runs on) that listens for requests from clients 
+// (like your browser) and sends back responses (like web pages, data, or files). Now, express is a function you 
+// can call to create an application.
 const app=express() // Calling express() creates an Express application instance. Think of it as your web server — you’ll use 
 // app to define routes (app.get(...), app.post(...), etc.) and middleware.
 const port = 8383 // This just sets a variable called port to 8383. When you start the server later (with app.listen(port, ...)), 
