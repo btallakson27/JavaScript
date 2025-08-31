@@ -85,9 +85,14 @@ async function getHistoricalPrices(){
 
 // 4. initialize server that serves up an html file that the user can play with
 
-const express = require('express')
-const app=express()
-const port = 8383 // the express server is serving the HTML file, index.html from your public folder. So whatever is in there 
+const express = require('express') // This imports the Express library into your program. 
+// require('express') loads the Express module (a Node.js framework for building web servers).
+// Now, express is a function you can call to create an application.
+const app=express() // Calling express() creates an Express application instance. Think of it as your web server — you’ll use 
+// app to define routes (app.get(...), app.post(...), etc.) and middleware.
+const port = 8383 // This just sets a variable called port to 8383. When you start the server later (with app.listen(port, ...)), 
+// that’s the number your server will “listen” on. Example: if you visit http://localhost:8383/, that’s where your Express app 
+// would respond.the express server is serving the HTML file, index.html from your public folder. So whatever is in there 
 // will show when you go to your search bar and type "localhost:8383"
 
 // middleware
