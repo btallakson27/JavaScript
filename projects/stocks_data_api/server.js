@@ -95,7 +95,13 @@ const app=express() // Calling express() creates an Express application instance
 const port = 8383 // This just sets a variable called port to 8383. When you start the server later (with app.listen(port, ...)), 
 // that’s the number your server will “listen” on. Example: if you visit http://localhost:8383/, that’s where your Express app 
 // would respond.the express server is serving the HTML file, index.html from your public folder. So whatever is in there 
-// will show when you go to your search bar and type "localhost:8383"
+// will show when you go to your search bar and type "localhost:8383". You don’t have to use 8383. You can use almost any 
+// number between 1024 and 65535 (these are called ephemeral or user ports). Developers usually just pick a free one.
+// Common choices in tutorials:
+// 3000 (very common with Node/Express)
+// 5000
+// 8080
+// You picked 8383, which works fine as long as nothing else on your computer is using that port.
 
 // middleware
 app.use(express.json())
