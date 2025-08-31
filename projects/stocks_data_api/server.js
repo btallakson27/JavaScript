@@ -79,7 +79,7 @@ async function getHistoricalPrices(){
         })
 
     }catch (err){
-        console.error('Error fetching data:', err.message)
+        console.error('Error fetching data:', err.message) // This logs an error message to the console (like console.log, but styled as an error).
     }
 }
 
