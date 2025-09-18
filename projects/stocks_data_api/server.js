@@ -117,7 +117,8 @@ app.listen(port, ()=>{console.log(`Server has started on port: ${port}`)}) // pp
 
 app.get('/', (req, res) => { // This defines a GET endpoint at / (the root). An endpoint is just a URL path on your server that clients (like a browser or a frontend app) can call.
   // In HTTP, there are different request methods. One of the most common is GET, which asks for data (no body). 
-    // So a GET endpoint means, “When someone requests this URL with the GET method, run this function and return something.”
+    // So a GET endpoint means, “When someone requests this URL with the GET method, run this function and return something.” In short, A GET endpoint is a server route that 
+    // responds to HTTP GET requests, usually used to fetch or read data.
     res.send('Server is working!') // When you open http://localhost:8383/ in your browser, you’ll see: Server is working!
 })
 
