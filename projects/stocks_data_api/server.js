@@ -89,7 +89,7 @@ const express = require('express') // This imports the Express library into your
 // require('express') loads the Express module (a Node.js framework for building web servers).
 // A web server is a program (and sometimes the physical machine it runs on) that listens for requests from clients 
 // (like your browser) and sends back responses (like web pages, data, or files). Now, express is a function you 
-// can call to create an application.
+// can call to create an application. 
 const app=express() // Calling express() creates an Express application instance. Think of it as your web server — you’ll use 
 // app to define routes (app.get(...), app.post(...), etc.) and middleware.
 const port = 8383 // This just sets a variable called port to 8383. When you start the server later (with app.listen(port, ...)), 
@@ -103,15 +103,19 @@ const port = 8383 // This just sets a variable called port to 8383. When you sta
 // 8080
 // You picked 8383, which works fine as long as nothing else on your computer is using that port.
 
-// middleware
-app.use(express.json())
-app.use(require('cors')())
-app.use(express.static('public'))
+// The following is middleware. Middleware in Express is like “filters” or “helpers” that run for every request before it reaches your routes.
+app.use(express.json()) // This tells Express: “If the request body has JSON, automatically parse it into a JavaScript object and put it in req.body.”
+app.use(require('cors')()) // enables CORS. CORS (Cross-Origin Resource Sharing) is a security feature in browsers.
+// By default, browsers block requests from one domain to another, like if your frontend and API have different ports. 
+// so adding this middleware says, “Allow other origins (like your frontend) to call this API.”
+app.use(express.static('public')) // Serves static files from the public folder. If you put a file at public/index.html, you can access it 
+// in the browser at: http://localhost:8383/index.html This is useful if you have frontend HTML, CSS, or JS files that need to be delivered directly.
 
-app.listen(port, ()=>{console.log(`Server hsa started on port: ${port}`)})
+app.listen(port, ()=>{console.log(`Server has started on port: ${port}`)}) // pp.listen starts your server and makes it listen for HTTP requests on the specified port.
+// In this case: http://localhost:8383 The callback just logs a confirmation.
 
-app.get('/', (req, res) => {
-  res.send('Server is working!')  
+app.get('/', (req, res) => { // This defines a GET endpoint at / (the root).
+  res.send('Server is working!') // When you open http://localhost:8383/ in your browser, you’ll see: Server is working!
 })
 
 // 5. define api endpoints to access stock data
