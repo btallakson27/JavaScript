@@ -108,7 +108,8 @@ app.use(express.json()) // This tells Express: “If the request body has JSON, 
 app.use(require('cors')()) // enables CORS. CORS (Cross-Origin Resource Sharing) is a security feature in browsers.
 // By default, browsers block requests from one domain to another, like if your frontend and API have different ports. 
 // so adding this middleware says, “Allow other origins (like your frontend) to call this API.”
-app.use(express.static('public')) // Serves static files from the public folder. If you put a file at public/index.html, you can access it 
+app.use(express.static('public')) // Serves static files from the public folder. A static file is a file that doesn’t change on 
+// the server side — it’s delivered to the browser exactly as it is stored.If you put a file at public/index.html, you can access it 
 // in the browser at: http://localhost:8383/index.html This is useful if you have frontend HTML, CSS, or JS files that need to be delivered directly.
 
 app.listen(port, ()=>{console.log(`Server has started on port: ${port}`)}) // pp.listen starts your server and makes it listen for HTTP requests on the specified port.
