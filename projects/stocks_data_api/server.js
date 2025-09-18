@@ -115,7 +115,11 @@ app.use(express.static('public')) // Serves static files from the public folder.
 app.listen(port, ()=>{console.log(`Server has started on port: ${port}`)}) // pp.listen starts your server and makes it listen for HTTP requests on the specified port.
 // In this case: http://localhost:8383 The callback just logs a confirmation.
 
-app.get('/', (req, res) => { // This defines a GET endpoint at / (the root). An endpoint is just a URL path on your server that clients (like a browser or a frontend app) can call.
+app.get('/', (req, res) => { // Express gives your callback two main objects: req (short for request). This represents the incoming HTTP request and
+    // contains information about the URL path (req.path), query parameters(req.query), route parameters (req.params), request body (req.body), headers (req.headers), and the HTTP method (req.method).
+    // res (short for response) represents the outgoing HTTP response you’ll send back to the client. Has methods like res.send() which sends text, HTML or objects, 
+    // res.json() which sends JSON, res.status() which sets the HTTP status code, and res.sendFile() which sends a file.
+    // This defines a GET endpoint at / (the root). An endpoint is just a URL path on your server that clients (like a browser or a frontend app) can call.
   // In HTTP, there are different request methods. One of the most common is GET, which asks for data (no body). 
     // So a GET endpoint means, “When someone requests this URL with the GET method, run this function and return something.” In short, A GET endpoint is a server route that 
     // responds to HTTP GET requests, usually used to fetch or read data.
