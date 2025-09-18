@@ -115,8 +115,10 @@ app.use(express.static('public')) // Serves static files from the public folder.
 app.listen(port, ()=>{console.log(`Server has started on port: ${port}`)}) // pp.listen starts your server and makes it listen for HTTP requests on the specified port.
 // In this case: http://localhost:8383 The callback just logs a confirmation.
 
-app.get('/', (req, res) => { // This defines a GET endpoint at / (the root).
-  res.send('Server is working!') // When you open http://localhost:8383/ in your browser, you’ll see: Server is working!
+app.get('/', (req, res) => { // This defines a GET endpoint at / (the root). An endpoint is just a URL path on your server that clients (like a browser or a frontend app) can call.
+  // In HTTP, there are different request methods. One of the most common is GET, which asks for data (no body). 
+    // So a GET endpoint means, “When someone requests this URL with the GET method, run this function and return something.”
+    res.send('Server is working!') // When you open http://localhost:8383/ in your browser, you’ll see: Server is working!
 })
 
 // 5. define api endpoints to access stock data
