@@ -4,90 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Data Webscaper</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Press+Start+2P&display=swap"
-        rel="stylesheet">
+    <title>Stock Data Web Scraper</title>
     <style>
-        * {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            color: #202124;
-        }
-
-        h1,
-        h2,
-        h3,
-        input,
-        button {
-            font-family: 'Press Start 2P', system-ui;
-        }
-
-        body {
-            /* min-height: 100vh; */
-            display: flex;
-            flex-direction: column;
-            padding: 14px;
-            gap: 14px;
-        }
-
-        header {
-            display: flex;
-            align-items: stretch;
-        }
-
-        header,
-        main {
-            max-width: 800px;
-            width: 100%;
-            margin: 0 auto;
-            gap: 14px;
-        }
-
-        header input {
-            flex: 1;
-            border-radius: 14px;
-            outline: none;
-            width: 100%;
-        }
-
-        header button {
-            border-radius: 14px;
-            background: transparent;
-            transition-duration: 200ms;
-            cursor: pointer;
-        }
-
-        header button:hover {
-            opacity: 0.7;
-        }
-
-        header button,
-        header input {
-            box-shadow: 2px 2px 6px 2px rgb(235, 250, 255);
-            padding: 14px 18px;
-            border: none;
-            outline: none;
-        }
-
-        p {
-            font-size: 0.9em;
-        }
-
-        @media (min-width: 640px) {
-
-            header button,
-            header input {
-                font-size: 1.2em;
-            }
-
-            p {
-                font-size: 1em;
-            }
-        }
+        body { font-family: sans-serif; padding: 20px; }
+        header { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
+        button { padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #f0f0f0; }
     </style>
 </head>
 
@@ -97,29 +22,78 @@
         <button>Search</button>
     </header>
     <main></main>
+
     <script>
-        let tickerInput = document.getElementById('ticker')
-        let sendBtn = document.querySelector('button')
-        let mainContainer = document.querySelector('main')
+        const tickerInput = document.getElementById('ticker')
+        const sendBtn = document.querySelector('button')
+        const mainContainer = document.querySelector('main')
 
         async function fetchStockData() {
-            let stock_ticker = tickerInput.value
-            if (!stock_ticker) { return }
+            const stock_ticker = tickerInput.value.trim()
+            if (!stock_ticker) {
+                mainContainer.innerText = 'Please enter a stock ticker.'
+                return
+            }
 
             try {
-                const backend_url = '/api'
-                const options = {
+                const res = await fetch('/api', {
                     method: 'POST',
-                    headers: {
-                        'content-type': 'application/json'
-                    },
+                    headers: { 'content-type': 'application/json' },
                     body: JSON.stringify({ stock_ticker })
+                })
+
+                if (!res.ok) {
+                    throw new Error(`Server responded with status ${res.status}`)
                 }
-                const res = await fetch(backend_url, options)
-                const { prices } = await res.json()
-                mainContainer.innerText = prices.join('\n')
+
+                const data = await res.json()
+                const prices = data?.prices || []
+
+                mainContainer.innerHTML = ''
+
+                if (!prices.length) {
+                    mainContainer.innerText = 'No data found for this ticker.'
+                    return
+                }
+
+                // Create table
+                const table = document.createElement('table')
+
+                // Table header
+                const thead = document.createElement('thead')
+                const headerRow = document.createElement('tr')
+                ;['Date', 'Close Price'].forEach(text => {
+                    const th = document.createElement('th')
+                    th.innerText = text
+                    headerRow.appendChild(th)
+                })
+                thead.appendChild(headerRow)
+                table.appendChild(thead)
+
+                // Table body
+                const tbody = document.createElement('tbody')
+                prices.forEach(entry => {
+                    const row = document.createElement('tr')
+
+                    const dateCell = document.createElement('td')
+                    dateCell.innerText = entry.date || '-'
+                    row.appendChild(dateCell)
+
+                    const closeCell = document.createElement('td')
+                    closeCell.innerText =
+                        typeof entry.close === 'number'
+                            ? `$${entry.close.toFixed(2)}`
+                            : '-'
+                    row.appendChild(closeCell)
+
+                    tbody.appendChild(row)
+                })
+                table.appendChild(tbody)
+
+                mainContainer.appendChild(table)
             } catch (err) {
-                console.log(err.message)
+                console.error('Error fetching stock data:', err)
+                mainContainer.innerText = 'Error fetching stock data. Please try again.'
             }
         }
 
