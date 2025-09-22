@@ -1,131 +1,77 @@
-// 1. Define stock ticker and API URL
-const stockTicker='MRNA' // stock symbol for Moderna.
-const range= '1mo' // the time range.
-const interval = '1d' // the interval (daily closing prices)
+const express = require('express')             // Import Express (web framework)
+const fetch = require('node-fetch')            // Import fetch for Node.js (API requests)
+const cors = require('cors')                   // Import CORS to allow cross-origin requests
 
-const url = `https://query1.finance.yahoo.com/v8/finance/chart/${stockTicker}?range=${range}&interval=${interval}`;
-// by setting range=1mo and interval=1d in your URL, you asked for daily data. The API respects that request and outputs one timestamp per trading day.
-// this becomes especially useful when you want to find this specific info in JSON as you will see below.
-// find url (directions in how to folder). next you must add the template literal strings. The ?, = and & are part of a query string. ? starts the query string, 
-// so it separates the base url from the parameters. the = assigns a value to a key. but you already set these values above, so do you really need to do 
-// them again? YES! And here's why. These variables live inside your code, but the Yahoo API doesn’t know what your variables are. It only sees the final URL string
-// the & separates multiple parameters, so you use it to chain additional key-value pairs. 
+const app = express()                          // Create Express app instance
+const port = 8383                              // Port the server will run on
 
-// 2. Fetch and process the data
+// Middleware
+app.use(express.json())                        // Parse incoming JSON request bodies
+app.use(cors())                                // Enable CORS so other apps can access this server
+app.use(express.static('public'))              // Serve static files from "public" folder
 
-async function getHistoricalPrices(){
-    try{
-        const res=await fetch(url) // gets the stock data from the url/internet.
-        const data= await res.json() // This parses the raw JSON body and gives you a regular JavaScript object so you can work with it in your code.
-        //The res object you get from fetch() is a special Response object, not raw JSON or a usable JS object by default, which is why you need to do this,
-        // then immediately turn it into a usable JSON object in the next line of code below. 
-        
-        // const data await JSON.parse(res) is incorrect and will not do the same thing, and here's why.
-        //res is a Response object from fetch(). .json() is a built-in method of the Response object that: Reads the body stream, Parses it as JSON, 
-        //and returns the result as a JavaScript object. This is the standard and correct way to get JSON from a response. 
-        // on the other hand, const data = await JSON.parse(res) is incorrect because res is a Response object, not a JSON string.
-        // JSON.parse() expects a JSON-formatted string, not a Response object. Bottom line: always use const data= await res.json() when working with fetch() and JSON APIs.
-        
-        console.log(JSON.stringify(data, null, 2)) // If you console.log(data) directly, most environments will show it in a 
-        // collapsible object form, meaning it will not show all nested levels by default. You might see [object] or [array =] placeholders
-        // if the structure is deep. JSON.stringify on the other hand, shows it as a full raw JSON text, readable anywhere.
-        // The bottom line is you need to do the previous steps because just fetching the raw  url, will give you a JSON string exactly as sent by Yahoo. 
-        // It would be all on one line, hard to read. Parsing it into a JS object, and then stringifying it into a JSON file, formats it with indentation 
-        // so you can actually explore it in your console.
+// Fetch stock data from Yahoo Finance API
+async function scrapeData(ticker) {
+    try {
+        const range = '1mo'                    // Time period = 1 month
+        const interval = '1d'                  // Data interval = 1 day
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=${range}&interval=${interval}` 
+                                               // Construct Yahoo Finance API URL
 
-        // all 3 of the following lines are extracting specific parts of the JSON response returned by the Yahoo Finance API.
-        const result=data.chart.result[0] 
-        // data.chart.result is an array. [0] means you're accessing the first element of that array. but the first thing inside it is "meta", not "timestamp". 
-        // So why does the original code work when it says "result.timestamp"? Because there's more in the object than just "meta".
-        // You're only seeing the beginning of the object printed, ie. the top of result[0]. The full structure continues down and includes more keys like "timestamp" and "indicators".
-        // data is the full JSON response from the API. 
-        // data.chart accesses the "chart" key.
-        // data.chart.result[0] grabs that single object.
-        // We assign it to a variable called result so we can use it more easily.
-        // Now result contains all the useful stock data.
+        const res = await fetch(url)           // Fetch stock data from Yahoo API
+        const data = await res.json()          // Convert response to JSON
 
-        // when it comes to all the notes for const result=data.chart.result[0] above, it starts with knowing that here you will need to access the timestamp and indicators.
-        const timestamps=result.timestamp // you know to look for "timestamp because it is an array of Unix time values, one for each trading day.
-        const prices = result.indicators.quote[0].close // you know to look for "indicators" because it contains price-related arrays (open, close, high, low, volume).
-        // .close is indeed the array of closing prices for each time period in the chart data you got from Yahoo Finance’s API.
-        
-        //3. Format the data.
-        const formatted=timestamps.map((ts,i)=>{ // map (loop over) each element in the array (timestamps) and pass in the parameters
-                // (ts,i) so for each timestamp (ts), at position i, make a new object that has a readable date from ts and the closing 
-                // price from prices[i]." this object is being returned below.
-            const date=new Date(ts * 1000).toISOString().split('T')[0] // ts is just the name you gave to each element of the array during iteration.
-            // for ts * 1000, Your ts value is a Unix timestamp in seconds, JavaScript’s Date 
-            // object expects milliseconds since Jan 1, 1970, so multiplying by 1000 converts seconds → milliseconds. new Date(...) Creates a Date object 
-            // from that timestamp. Now you have something like: Fri Aug 12 2022 00:00:00 GMT+0000 .toISOString() Converts the date into an ISO 8601 string 
-            // in UTC time, e.g.:"2022-08-12T00:00:00.000Z" .split('T') Splits that ISO string into two parts: ["2022-08-12", "00:00:00.000Z"] The 'T' is 
-            // the separator between the date and time in ISO format. [0] Takes the first part (just the date part): "2022-08-12"
-            // Result: date now contains just the date in YYYY-MM-DD format.
-            return {date,close:prices[i]} // For each timestamp index i, you look up the corresponding closing price from the prices array.
-                // this line of code returns an object literal with two properties. 
-                // In JavaScript, { date, close: prices[i] } is shorthand for: { date: date, close: prices[i] }
-        })
+        if (!data.chart || !data.chart.result) return []  
+                                               // If response is invalid, return empty array. this is a little “defensive coding”. 
+                                               // If there’s no valid data, instead of crashing the code, or returning null/undefined (which would confuse your API response structure), it safely returns an empty array.
 
-        console.log(`\n📈 Historical Closing Prices for ${stockTicker}:\n`)
-        // \n → adds a line break before and after the text, to make the console output look cleaner.
-        // 📈 → just an emoji to decorate the output.
-        // ${stockTicker} → string interpolation: inserts the value of the stockTicker variable (in your case "MRNA") into the string.
-        // example output -> 📈 Historical Closing Prices for MRNA:
-        // .forEach(...) loops through every object in that array.
-        // "entry" is a parameter name you chose, and it's part of an arrow function. 
-        // JavaScript calls your arrow function once for each element in the array.
-        // So entry is just a variable that represents the current array element while looping.
-        formatted.forEach(entry=>{
-            console.log(`${entry.date}: $${entry.close}`)
-        })
+        const result = data.chart.result[0]    // First result object
+        const closes = result.indicators.quote[0].close  
+                                               // Array of closing prices
+        const timestamps = result.timestamp    // Array of UNIX timestamps
 
-    }catch (err){
-        console.error('Error fetching data:', err.message) // This logs an error message to the console (like console.log, but styled as an error).
+        const formatted = closes.map((close, i) => {    // Each closing price corresponds to a timestamp at the same index in the timestamps array.
+            const date = new Date(timestamps[i] * 1000) // Convert UNIX timestamp → JS date. Here, i is the current index from the closes array. By using timestamps[i], each closing price is matched with its correct date. You could iterate over timestamps, but mapping over closes Skips null prices using return close != null ? ... : null and filters out timestamps that don’t have a price. If we mapped timestamps first, we’d need extra logic to handle null closes.
+                .toISOString()                          // Format to ISO string (YYYY-MM-DDTHH:mm:ssZ)
+                .split('T')[0]                          // Keep only the date part (YYYY-MM-DD)
+
+            return close != null ? { date, close } : null  // a shorthand if-else. It says, if there is a current closing price, return the date and closing price, if not, return null.
+                                               // Return { date, close } object, skip nulls
+        }).filter(Boolean)                      // Removes null entries. So any missing or invalid prices are skipped from the final array.
+
+        return formatted                        // Return cleaned stock price data
+    } catch (err) {
+        console.log('Error fetching stock data:', err.message)  
+                                               // Log errors for debugging
+        return []                               // Return empty array on error
     }
 }
 
-// 4. initialize server that serves up an html file that the user can play with
-
-const express = require('express') // This imports the Express library into your program. 
-// require('express') loads the Express module (a Node.js framework for building web servers).
-// A web server is a program (and sometimes the physical machine it runs on) that listens for requests from clients 
-// (like your browser) and sends back responses (like web pages, data, or files). Now, express is a function you 
-// can call to create an application. 
-const app=express() // Calling express() creates an Express application instance. Think of it as your web server — you’ll use 
-// app to define routes (app.get(...), app.post(...), etc.) and middleware.
-const port = 8383 // This just sets a variable called port to 8383. When you start the server later (with app.listen(port, ...)), 
-// that’s the number your server will “listen” on. Example: if you visit http://localhost:8383/, that’s where your Express app 
-// would respond.the express server is serving the HTML file, index.html from your public folder. So whatever is in there 
-// will show when you go to your search bar and type "localhost:8383". You don’t have to use 8383. You can use almost any 
-// number between 1024 and 65535 (these are called ephemeral or user ports). Developers usually just pick a free one.
-// Common choices in tutorials:
-// 3000 (very common with Node/Express)
-// 5000
-// 8080
-// You picked 8383, which works fine as long as nothing else on your computer is using that port.
-
-// The following is middleware. Middleware in Express is like “filters” or “helpers” that run for every request before it reaches your routes.
-app.use(express.json()) // This tells Express: “If the request body has JSON, automatically parse it into a JavaScript object and put it in req.body.”
-app.use(require('cors')()) // enables CORS. CORS (Cross-Origin Resource Sharing) is a security feature in browsers.
-// By default, browsers block requests from one domain to another, like if your frontend and API have different ports. 
-// so adding this middleware says, “Allow other origins (like your frontend) to call this API.”
-app.use(express.static('public')) // Serves static files from the public folder. A static file is a file that doesn’t change on 
-// the server side — it’s delivered to the browser exactly as it is stored.If you put a file at public/index.html, you can access it 
-// in the browser at: http://localhost:8383/index.html This is useful if you have frontend HTML, CSS, or JS files that need to be delivered directly.
-
-app.listen(port, ()=>{console.log(`Server has started on port: ${port}`)}) // pp.listen starts your server and makes it listen for HTTP requests on the specified port.
-// In this case: http://localhost:8383 The callback just logs a confirmation.
-
-app.get('/', (req, res) => { // Express gives your callback two main objects: req (short for request). This represents the incoming HTTP request and
-    // contains information about the URL path (req.path), query parameters(req.query), route parameters (req.params), request body (req.body), headers (req.headers), and the HTTP method (req.method).
-    // res (short for response) represents the outgoing HTTP response you’ll send back to the client. Has methods like res.send() which sends text, HTML or objects, 
-    // res.json() which sends JSON, res.status() which sets the HTTP status code, and res.sendFile() which sends a file.
-    // This defines a GET endpoint at / (the root). An endpoint is just a URL path on your server that clients (like a browser or a frontend app) can call.
-  // In HTTP, there are different request methods. One of the most common is GET, which asks for data (no body). 
-    // So a GET endpoint means, “When someone requests this URL with the GET method, run this function and return something.” In short, A GET endpoint is a server route that 
-    // responds to HTTP GET requests, usually used to fetch or read data.
-    res.send('Server is working!') // When you open http://localhost:8383/ in your browser, you’ll see: Server is working!
+// API endpoint (POST request)
+app.post('/api', async (req, res) => { // creates a route that listens for POST requests to /api, allowing clients to send data (like a stock ticker), process it on the server, and return a response.
+    const { stock_ticker: ticker } = req.body  // Extract "stock_ticker" from request body. This line instantiates ticker.
+    if (!ticker) return res.status(400).send({ prices: [] })  // does three things. 1. res.status(400) → Sets HTTP status code to 400 Bad Request. Indicates to the client: “You didn’t send required data.”
+                                                              // 2. .send({ prices: [] }) → Sends a JSON response with an empty prices array. Keeps the response structure consistent, so clients can always expect prices to exist.
+                                                              // 3. return → Stops further execution of the route handler. No further processing (like calling scrapeData) happens.
+    try {
+        const prices = await scrapeData(ticker)// Fetch stock data
+        console.log('Returning data for', ticker, prices.length, 'rows')  
+                                               // Log result info
+        res.status(200).send({ prices: prices || [] }) // status(200) sets the HTTP status code of the response. 200 OK → indicates the request was successful.
+                                               // sends data back to the client. || [] = fallback: If prices is null, undefined, or any falsy value, it will default to an empty array. Ensures the client always receives a consistent array in prices.
+    } catch (err) {
+        console.error('Error in /api:', err)   // Log error if API call fails
+        res.status(500).send({ prices: [] })  // Respond with empty array + 500 status. 500 = Internal Server Error.
+    }
 })
 
-// 5. define api endpoints to access stock data
+// Optional test endpoint
+app.get('/test', (req, res) => {
+    res.send('Server is running!')             // Simple GET test route
+})
 
-getHistoricalPrices()
+// Start server
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`)  
+                                               // Print message when server starts
+})
