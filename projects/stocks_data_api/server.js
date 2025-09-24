@@ -49,7 +49,7 @@ async function scrapeData(ticker) {
 
 // API endpoint (POST request)
 app.post('/api', async (req, res) => { // creates a route that listens for POST requests to /api, allowing clients to send data (like a stock ticker), process it on the server, and return a response.
-    const { stock_ticker: ticker } = req.body  // Extract "stock_ticker" from request body. This line instantiates ticker.
+    const { stock_ticker: ticker } = req.body  // req.body is the JSON object the client sends. Example body: {"stock_ticker": "MRNA"} The curly braces use object destructuring with aliasing. It looks for a property called stock_ticker inside req.body. It creates a new variable named ticker with that value. This is the point where ticker is instantiated (it comes into existence only after the request is made).
     if (!ticker) return res.status(400).send({ prices: [] })  // does three things. 1. res.status(400) → Sets HTTP status code to 400 Bad Request. Indicates to the client: “You didn’t send required data.”
                                                               // 2. .send({ prices: [] }) → Sends a JSON response with an empty prices array. Keeps the response structure consistent, so clients can always expect prices to exist.
                                                               // 3. return → Stops further execution of the route handler. No further processing (like calling scrapeData) happens.
