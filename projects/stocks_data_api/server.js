@@ -37,7 +37,7 @@ async function scrapeData(ticker) {
 
             return close != null ? { date, close } : null  // a shorthand if-else. It says, if there is a current closing price, return the date and closing price, if not, return null.
                                                // Return { date, close } object, skip nulls
-        }).filter(Boolean)                      // Removes null entries. So any missing or invalid prices are skipped from the final array.
+        }).filter(Boolean)                      // Removes null entries. So any missing or invalid prices are skipped from the final array. They simply don’t show up in the final array.
 
         return formatted                        // Return cleaned stock price data
     } catch (err) {
