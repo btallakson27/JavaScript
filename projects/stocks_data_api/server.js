@@ -41,7 +41,8 @@ async function scrapeData(ticker) {
 
         return formatted                        // Return cleaned stock price data
     } catch (err) {
-        console.log('Error fetching stock data:', err.message)  
+        console.log('Error fetching stock data:', err.message) // here you use console.error because you’re catching an error while calling Yahoo Finance. console.log is fine because you probably just want a quick note. You’re not necessarily worried about a full stack trace every time Yahoo’s API is flaky.
+    //This keeps your terminal output cleaner.
                                                // Log errors for debugging
         return []                               // Return empty array on error
     }
