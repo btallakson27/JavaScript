@@ -54,16 +54,21 @@ app.post('/api', async (req, res) => { // creates a route that listens for POST 
                                                               // 2. .send({ prices: [] }) → Sends a JSON response with an empty prices array. Keeps the response structure consistent, so clients can always expect prices to exist.
                                                               // 3. return → Stops further execution of the route handler. No further processing (like calling scrapeData) happens.
     try {
-        const prices = await scrapeData(ticker)// Fetch stock data
-        console.log('Returning data for', ticker, prices.length, 'rows')  
-                                               // Log result info
+        const prices = await scrapeData(ticker)// Fetches stock data. called prices for simplicity but actually has dates and prices. 
+        console.log('Returning data for', ticker, prices.length, 'rows')  // dateAndPrice.length prints the number of objects returned from scrapeData (i.e., how many {date, close} entries were parsed).
+        // why would I want to write this line at all? debugging and visibility, monitoring usage, and performance insight.
+                                
         res.status(200).send({ prices: prices || [] }) // status(200) sets the HTTP status code of the response. 200 OK → indicates the request was successful.
                                                // sends data back to the client. || [] = fallback: If prices is null, undefined, or any falsy value, it will default to an empty array. Ensures the client always receives a consistent array in prices.
     } catch (err) {
-        console.error('Error in /api:', err)   // Log error if API call fails
+        console.error('Error in /api:', err)   // here you want to use console.error because you’re catching an error in your own server logic. This is more useful because if there’s a bug in your code (e.g. undefined variable, typo), you want the stack trace.
+    // That’s how you’ll find the exact line where things went wrong. A stack trace is the "trail of breadcrumbs" your program leaves when an error is thrown. It shows What the error was (Error: something went wrong), which function threw it, and which line numbers in which files led up to that error (the stack of function calls).
         res.status(500).send({ prices: [] })  // Respond with empty array + 500 status. 500 = Internal Server Error.
     }
 })
+
+// at this point, running node.js would return nothing, because you never actually started the server. 
+// this happens below when you write app.listen(port, ()=>{...})
 
 // Optional test endpoint
 app.get('/test', (req, res) => {
