@@ -35,7 +35,7 @@ async function scrapeData(ticker) {
                 .toISOString()                          // Format to ISO string (YYYY-MM-DDTHH:mm:ssZ)
                 .split('T')[0]                          // Keep only the date part (YYYY-MM-DD)
 
-            return close != null ? { date, close } : null  // a shorthand if-else. It says, if there is a current closing price, return the date and closing price, if not, return null.
+            return close != null ? { date, close } : null  // if close is not null, return an object with the date and closing price. otherwise, return null.
                                                // Return { date, close } object, skip nulls
         }).filter(Boolean)                      // Removes null entries. So any missing or invalid prices are skipped from the final array. They simply don’t show up in the final array.
 
