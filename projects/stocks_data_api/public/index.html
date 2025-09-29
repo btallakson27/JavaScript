@@ -24,80 +24,80 @@
     <main></main>
 
     <script>
-        const tickerInput = document.getElementById('ticker')
-        const sendBtn = document.querySelector('button')
-        const mainContainer = document.querySelector('main')
+         const tickerInput = document.getElementById('ticker')
+    const sendBtn = document.querySelector('button')
+    const mainContainer = document.querySelector('main')
 
-        async function fetchStockData() {
-            const stock_ticker = tickerInput.value.trim()
-            if (!stock_ticker) {
-                mainContainer.innerText = 'Please enter a stock ticker.'
+    async function fetchStockData() {
+        const stock_ticker = tickerInput.value.trim()
+        if (!stock_ticker) {
+            mainContainer.innerText = 'Please enter a stock ticker.'
+            return
+        }
+
+        try {
+            const res = await fetch('/api', {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ stock_ticker })
+            })
+
+            if (!res.ok) {
+                throw new Error(`Server responded with status ${res.status}`)
+            }
+
+            const data = await res.json()
+            const prices = data?.prices || []
+
+            mainContainer.innerHTML = ''
+
+            if (!prices.length) {
+                mainContainer.innerText = 'No data found for this ticker.'
                 return
             }
 
-            try {
-                const res = await fetch('/api', {
-                    method: 'POST',
-                    headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify({ stock_ticker })
-                })
+            // ✅ Filter out any empty rows (just in case)
+            const filteredPrices = prices.filter(entry => entry.date && entry.close != null)
 
-                if (!res.ok) {
-                    throw new Error(`Server responded with status ${res.status}`)
-                }
+            // Create table
+            const table = document.createElement('table')
 
-                const data = await res.json()
-                const prices = data?.prices || []
+            // Table header
+            const thead = document.createElement('thead')
+            const headerRow = document.createElement('tr')
+            ;['Date', 'Close Price'].forEach(text => {
+                const th = document.createElement('th')
+                th.innerText = text
+                headerRow.appendChild(th)
+            })
+            thead.appendChild(headerRow)
+            table.appendChild(thead)
 
-                mainContainer.innerHTML = ''
+            // Table body
+            const tbody = document.createElement('tbody')
+            filteredPrices.forEach(entry => {
+                const row = document.createElement('tr')
 
-                if (!prices.length) {
-                    mainContainer.innerText = 'No data found for this ticker.'
-                    return
-                }
+                const dateCell = document.createElement('td')
+                dateCell.innerText = entry.date  // ✅ no placeholder dashes
+                row.appendChild(dateCell)
 
-                // Create table
-                const table = document.createElement('table')
+                const closeCell = document.createElement('td')
+                closeCell.innerText = `$${entry.close.toFixed(2)}`
+                row.appendChild(closeCell)
 
-                // Table header
-                const thead = document.createElement('thead')
-                const headerRow = document.createElement('tr')
-                ;['Date', 'Close Price'].forEach(text => {
-                    const th = document.createElement('th')
-                    th.innerText = text
-                    headerRow.appendChild(th)
-                })
-                thead.appendChild(headerRow)
-                table.appendChild(thead)
+                tbody.appendChild(row)
+            })
+            table.appendChild(tbody)
 
-                // Table body
-                const tbody = document.createElement('tbody')
-                prices.forEach(entry => {
-                    const row = document.createElement('tr')
-
-                    const dateCell = document.createElement('td')
-                    dateCell.innerText = entry.date || '-'
-                    row.appendChild(dateCell)
-
-                    const closeCell = document.createElement('td')
-                    closeCell.innerText =
-                        typeof entry.close === 'number'
-                            ? `$${entry.close.toFixed(2)}`
-                            : '-'
-                    row.appendChild(closeCell)
-
-                    tbody.appendChild(row)
-                })
-                table.appendChild(tbody)
-
-                mainContainer.appendChild(table)
-            } catch (err) {
-                console.error('Error fetching stock data:', err)
-                mainContainer.innerText = 'Error fetching stock data. Please try again.'
-            }
+            mainContainer.appendChild(table)
+        } catch (err) {
+            console.error('Error fetching stock data:', err)
+            mainContainer.innerText = 'Error fetching stock data. Please try again.'
         }
+    }
 
-        sendBtn.addEventListener('click', fetchStockData)
+    sendBtn.addEventListener('click', fetchStockData)
     </script>
 </body>
 
