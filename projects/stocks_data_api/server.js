@@ -44,7 +44,7 @@ async function scrapeData(ticker) {
         console.log('Error fetching stock data:', err.message) // here you use console.error because you’re catching an error while calling Yahoo Finance. console.log is fine because you probably just want a quick note. You’re not necessarily worried about a full stack trace every time Yahoo’s API is flaky.
     //This keeps your terminal output cleaner.
                                                // Log errors for debugging
-        return []                               // Return empty array on error
+        return []                               // why? To make sure that no matter what happens, the function always returns a predictable data type. If scrapeData() failed and didn’t return anything, prices would be undefined, and prices.length would cause an error. It’s graceful error handling — your app stays stable, and the user just sees “No data found.”
     }
 }
 
