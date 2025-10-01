@@ -5,119 +5,170 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Data Web Scraper</title>
+
     <style>
+        /* Base page styling */
         body {
-            font-family: sans-serif;
-            padding: 20px; 
-            background: rgba(187, 195, 123, 0.267)}
+            font-family: sans-serif; /* Clean, readable font */
+            padding: 20px;           /* Space around content */
+            background: rgba(187, 195, 123, 0.267); /* Light background */
+        }
+
+        /* Header container (input + button) */
         header {
             display: flex; 
-            justify-content: center;
-            gap:10px; 
-            margin-bottom: 20px; }
+            justify-content: center; /* Centers items horizontally */
+            gap: 10px;               /* Space between input and button */
+            margin-bottom: 20px;     /* Space below header */
+        }
+
+        /* Input field styling */
         input {
-            flex: 0.1; 
-            padding:8px; 
+            flex: 0.1;               /* Controls relative width */
+            padding: 8px; 
             border-radius: 6px; 
-            border: 1px solid #ccc; }
+            border: 1px solid #ccc;  /* Light border */
+        }
+
+        /* Button styling */
         button { 
             padding: 8px 12px; 
             border-radius: 6px; 
-            cursor: pointer; }
+            cursor: pointer;        /* Pointer cursor on hover */
+        }
+
+        /* Table layout */
         table { 
             width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 20px; }
+            border-collapse: collapse; /* Removes spacing between borders */
+            margin-top: 20px; 
+        }
+
+        /* Table cell styling */
         th, td { 
             border: 1px solid #ccc; 
             padding: 8px; 
-            text-align: left; }
-        th { background: #f0f0f0; }
+            text-align: left; 
+        }
+
+        /* Header row background */
+        th { 
+            background: #f0f0f0; 
+        }
     </style>
 </head>
 
 <body>
+    <!-- Input and button for user to search stock -->
     <header>
         <input id="ticker" placeholder="Enter stock ticker ..." />
         <button>Search</button>
     </header>
+
+    <!-- Main container where data will be displayed -->
     <main></main>
 
     <script>
-         const tickerInput = document.getElementById('ticker')
-    const sendBtn = document.querySelector('button')
-    const mainContainer = document.querySelector('main')
+        // Get references to key DOM elements
+        const tickerInput = document.getElementById('ticker')
+        const sendBtn = document.querySelector('button')
+        const mainContainer = document.querySelector('main')
 
-    async function fetchStockData() {
-        const stock_ticker = tickerInput.value.trim()
-        if (!stock_ticker) {
-            mainContainer.innerText = 'Please enter a stock ticker.'
-            return
-        }
+        // Async function to fetch and display stock data
+        async function fetchStockData() {
 
-        try {
-            const res = await fetch('/api', {
-                method: 'POST',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ stock_ticker })
-            })
+            // Get the stock ticker symbol entered by user
+            const stock_ticker = tickerInput.value.trim()
 
-            if (!res.ok) {
-                throw new Error(`Server responded with status ${res.status}`)
-            }
-
-            const data = await res.json()
-            const prices = data?.prices || []
-
-            mainContainer.innerHTML = ''
-
-            if (!prices.length) {
-                mainContainer.innerText = 'No data found for this ticker.'
+            // If user left input blank, show message and stop
+            if (!stock_ticker) {
+                mainContainer.innerText = 'Please enter a stock ticker.'
                 return
             }
 
-            // ✅ Filter out any empty rows (just in case)
-            const filteredPrices = prices.filter(entry => entry.date && entry.close != null)
+            try {
+                // Send POST request to backend API route (/api)
+                const res = await fetch('/api', {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({ stock_ticker }) // send ticker as JSON
+                })
 
-            // Create table
-            const table = document.createElement('table')
+                // If server responded with an error (e.g. 404, 500)
+                if (!res.ok) {
+                    throw new Error(`Server responded with status ${res.status}`)
+                }
 
-            // Table header
-            const thead = document.createElement('thead')
-            const headerRow = document.createElement('tr')
-            ;['Date', 'Close Price'].forEach(text => {
-                const th = document.createElement('th')
-                th.innerText = text
-                headerRow.appendChild(th)
-            })
-            thead.appendChild(headerRow)
-            table.appendChild(thead)
+                // Parse JSON response
+                const data = await res.json()
+                const prices = data?.prices || [] // Extract prices array safely
 
-            // Table body
-            const tbody = document.createElement('tbody')
-            filteredPrices.forEach(entry => {
-                const row = document.createElement('tr')
+                // Clear any previous results
+                mainContainer.innerHTML = ''
 
-                const dateCell = document.createElement('td')
-                dateCell.innerText = entry.date  // ✅ no placeholder dashes
-                row.appendChild(dateCell)
+                // If no data came back
+                if (!prices.length) {
+                    mainContainer.innerText = 'No data found for this ticker.'
+                    return
+                }
 
-                const closeCell = document.createElement('td')
-                closeCell.innerText = `$${entry.close.toFixed(2)}`
-                row.appendChild(closeCell)
+                // Remove invalid or empty rows from data
+                const filteredPrices = prices.filter(entry => entry.date && entry.close != null)
 
-                tbody.appendChild(row)
-            })
-            table.appendChild(tbody)
+                // Create table element
+                const table = document.createElement('table')
 
-            mainContainer.appendChild(table)
-        } catch (err) {
-            console.error('Error fetching stock data:', err)
-            mainContainer.innerText = 'Error fetching stock data. Please try again.'
+                /* ---------------- TABLE HEADER ---------------- */
+                const thead = document.createElement('thead')
+                const headerRow = document.createElement('tr')
+
+                // Create <th> elements for each column
+                ;['Date', 'Close Price'].forEach(text => {
+                    const th = document.createElement('th')
+                    th.innerText = text
+                    headerRow.appendChild(th)
+                })
+
+                // Attach header to table
+                thead.appendChild(headerRow)
+                table.appendChild(thead)
+
+                /* ---------------- TABLE BODY ---------------- */
+                const tbody = document.createElement('tbody')
+
+                // Add each stock price entry as a row
+                filteredPrices.forEach(entry => {
+                    const row = document.createElement('tr')
+
+                    // Create date cell
+                    const dateCell = document.createElement('td')
+                    dateCell.innerText = entry.date
+                    row.appendChild(dateCell)
+
+                    // Create close price cell
+                    const closeCell = document.createElement('td')
+                    closeCell.innerText = `$${entry.close.toFixed(2)}`
+                    row.appendChild(closeCell)
+
+                    // Add row to table body
+                    tbody.appendChild(row)
+                })
+
+                // Attach body to table
+                table.appendChild(tbody)
+
+                // Finally, add table to the main container
+                mainContainer.appendChild(table)
+
+            } catch (err) {
+                // Handle fetch or parsing errors gracefully
+                console.error('Error fetching stock data:', err)
+                mainContainer.innerText = 'Error fetching stock data. Please try again.'
+            }
         }
-    }
 
-    sendBtn.addEventListener('click', fetchStockData)
+        // Add event listener: run fetchStockData() when button clicked
+        sendBtn.addEventListener('click', fetchStockData)
     </script>
 </body>
 
