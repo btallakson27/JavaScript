@@ -70,7 +70,7 @@
 
     <script>
         // Get references to key DOM elements
-        const tickerInput = document.getElementById('ticker')
+        const tickerInput = document.getElementById('ticker') // could target the input but the id gives this input a unique identifier. you could use document.querySelector('input'), but but that would just grab the first <input> it finds — not necessarily the one you want.
         const sendBtn = document.querySelector('button')
         const mainContainer = document.querySelector('main')
 
