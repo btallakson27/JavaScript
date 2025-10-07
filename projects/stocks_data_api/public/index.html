@@ -88,10 +88,10 @@
 
             try {
                 // Send POST request to backend API route (/api)
-                const res = await fetch('/api', {
-                    method: 'POST',
-                    headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify({ stock_ticker }) // send ticker as JSON
+                const res = await fetch('/api', { //go to this endpoint in the backend...
+                    method: 'POST', // look for a post request...
+                    headers: { 'content-type': 'application/json' }, // that is in json format....
+                    body: JSON.stringify({ stock_ticker }) // and send the stock_ticker to the backend as a JSON string (because HTTP requests can’t send raw JavaScript objects),
                 })
 
                 // If server responded with an error (e.g. 404, 500)
