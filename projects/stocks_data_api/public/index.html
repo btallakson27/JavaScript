@@ -6,41 +6,14 @@
     <title>Stock Data Web Scraper</title>
     <!--7. Do a bit of styling-->
     <style>
-        body {
-            padding: 20px;
-            font-family: sans-serif;
-            background: rgb(163, 187, 163);
-        }
-        header {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        input {
-            flex: 0.1;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid black;
-        }
-        button {
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        table {
-            width: 30%;
-            border-collapse: collapse; /* Removes spacing between borders */
-            margin-top: 20px;
-        }
-         th, td { 
-            border: 1px solid #ccc; 
-            padding: 8px; 
-            text-align: left; 
-        }
-        th { 
-            background: #f0f0f0; 
-        }
+        body { padding: 20px; font-family: sans-serif; background: rgb(163, 187, 163); }
+        header { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        main {display: flex; justify-content: center;}
+        input { flex: 0.1; padding: 8px; border-radius: 6px; border: 1px solid black; }
+        button { padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+        table { width: 30%; border-collapse: collapse; margin-top: 20px; background: white; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #f0f0f0; }
     </style>
 </head>
 <body>
@@ -80,18 +53,21 @@
             })
             console.log("Response received:", res)
 
-            // if (!res.ok){ // literally means “the response is not OK.”
-            //     console.log("res.ok:", res.ok, "status:", res.status)
-            //     throw new Error(`Server responded with status ${res.status}`) // this line is a manual error check after making a fetch request.
-            //     // “If the server didn’t respond with a success code (200–299), treat it as an error and stop here.”
-            // }
+            if (!res.ok){ // literally means “the response is not OK.”
+                throw new Error(`Server responded with status ${res.status}`) // this line is a manual error check after making a fetch request.
+                // “If the server didn’t respond with a success code (200–299), treat it as an error and stop here.”
+            }
 
             // 11. Once you get the response, parse JSON response, and extract prices array safely.
             console.log("About to parse JSON")
             const data=await res.json() // turns the backend’s JSON response (e.g. {"prices":[...]}) into a JavaScript object.
             console.log("Parsed JSON:", data)
-            const prices=data?.prices || [] // extracts the prices array or falls back to an empty array if something went wrong. This prepares your data for rendering.
-            console.log("Prices array length:", prices.length)
+                
+            const prices = Array.isArray(data?.prices) ? data.prices : []; 
+                // 1. data?.prices uses optional chaining to safely access prices even if data is undefined.
+                // 2. Array.isArray(...) is a built-in JavaScript function that checks if the argument is an array.
+                // 3. If it isn’t, prices defaults to an empty array [], so your .filter and .forEach calls won’t fail.
+                console.log("Prices array length:", prices.length);
 
             // 12. Now you have useable data that's waiting to be processed for the user. 
             // Before adding new data, you wipe out any previous table or messages, to ensure you only see the latest search result.
