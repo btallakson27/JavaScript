@@ -64,6 +64,7 @@
             console.log("Parsed JSON:", data)
                 
             const prices = Array.isArray(data?.prices) ? data.prices : []; 
+                // if you just did this, const prices = data?.prices || []; it assumes data is an object with a prices property. If the backend returns an array directly, data?.prices is undefined → prices becomes [].
                 // 1. data?.prices uses optional chaining to safely access prices even if data is undefined.
                 // 2. Array.isArray(...) is a built-in JavaScript function that checks if the argument is an array.
                 // 3. If it isn’t, prices defaults to an empty array [], so your .filter and .forEach calls won’t fail.
