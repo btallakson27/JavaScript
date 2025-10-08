@@ -49,7 +49,7 @@ app.post('/api', async (req,res)=>{
     // route handler if no ticker is provided. WIthout return, the code would continue to try to call scrapeData(ticker) with undefined, which could cause errors.
 
     try{ // build this whenever
-        const prices=await scrapeData(ticker)
+        const prices=await scrapeData(ticker) // This line does not guarantee that the result is an array AND IT MUST BE AN ARRAY OR THIS ENTIRE THING WON'T WORK!!! 
         console.log('Returning data for', ticker, prices.length, 'rows')
 
         res.status(200).send({prices:prices || []}) // in JavaScript, the primary purpose of return is to stop execution of the current function, so you don't want it here.
