@@ -102,15 +102,11 @@
             const headerRow=document.createElement('tr') // this is the single row that contains your column labels — “Date” and “Close Price”.
             // So when you append headerRow to thead, you’re essentially saying: “Put this row of column names inside the header section of my table.”
 
-            // 17. Creates a header with two columns: “Date” and “Close Price.”
-            // …but notice: this only creates the header, it does not create any rows for actual data. That’s why we need the tbody and the 
-            // forEach loop over filteredPrices below — to actually populate the table with the real values under the headers.Think of it as:
-                // thead → column labels
-                // tbody → the real data rows. It’s totally normal to need both.
-            ['Date', 'Close Price'].forEach(text=>{ // ['Date', 'Close Price'] creates a small array with two strings, and then calls .forEach(...) to loop through each item in that array. So the loop runs twice: First time → text = 'Date' Second time → text = 'Close Price'
-                const th=document.createElement('th') // creates a new <th> element — a blank table header cell.
-                th.innerText=text // puts text inside that header cell, date on first loop, close price on second.
-                headerRow.appendChild(th) // Takes the newly created <th> cell and adds it to your header row (<tr>).
+            // 17. put the text in the top row of the table (headerRow)
+            ['Date', 'Close Price'].forEach(text=>{ // loop over every string in the array... 
+                const th=document.createElement('th') // and for every string create a <th> element, not visible until appendid.
+                th.innerText=text // this is the single row that contains your column labels — “Date” and “Close Price”.
+                headerRow.appendChild(th) // set the visible text inside the <th>
             })
 
             // 18. Then you attach it all together here. 
