@@ -34,9 +34,13 @@
 
         // 9. Create the main function. This is where the frontend will, get the user's input, send it to the backend, display the returned data.
         async function fetchStockData(){
+                // you don't want these lines in your try-catch block because you validate user input before making any network call.
+                // If it’s empty, you stop execution early (return). The try block only runs if you actually have a ticker worth fetching.
+                // That’s exactly how you want it — it avoids wasting time making a useless API call.
+                // very first thing you want to check before sending stock_ticker to backend is make sure there are no extra blank spaces
             const stock_ticker=tickerInput.value.trim() // .trim() is a string method that remoes any extra spaces from the beginning and end of a string.
 
-            // If user left input blank, show message and stop
+            // If user did not enter a stock ticker, show message and stop
             if (!stock_ticker) {
                 mainContainer.innerText = 'Please enter a stock ticker.'
                 return
@@ -47,7 +51,7 @@
                 // 10. Make the API call (frontend → backend). This line connects the frontend to your backend route from earlier.
             // When the user clicks “Search,” this sends their ticker to /api, and waits for the backend’s response.
             // You now have full client-server communication.
-            const res=await fetch('/api',{
+            const res=await fetch('/api',{ // here you are sending a network call (an API call). fetch always goes in a try/catch block.
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'}, // application must be singular
                 body: JSON.stringify({stock_ticker})
@@ -61,21 +65,22 @@
 
             // 11. Once you get the response, parse JSON response, and extract prices array safely.
             console.log("About to parse JSON")
-            const data=await res.json() // turns the backend’s JSON response (e.g. {"prices":[...]}) into a JavaScript object.
+            const data=await res.json() // turns the backend’s JSON response (e.g. {"prices":[...]}) into a JavaScript object so you can work with it in JS.
             console.log("Parsed JSON:", data)
                 
             const prices = Array.isArray(data?.prices) ? data.prices : []; 
-                // if you just did this, const prices = data?.prices || []; it assumes data is an object with a prices property. If the backend returns an array directly, data?.prices is undefined → prices becomes [].
-                // 1. data?.prices uses optional chaining to safely access prices even if data is undefined.
-                // 2. Array.isArray(...) is a built-in JavaScript function that checks if the argument is an array.
-                // 3. If it isn’t, prices defaults to an empty array [], so your .filter and .forEach calls won’t fail.
+                // what you have is the wanted data which we called 'prices' on the backend, so let's call it the same thing here. not the 
+                // same as prices on the backend.
+                // This line creates a constant prices that safely checks whether data.prices exists and is an array. If it is, it assigns 
+                // that array to prices; otherwise, it assigns an empty array.
                 console.log("Prices array length:", prices.length);
 
             // 12. Now you have useable data that's waiting to be processed for the user. 
             // Before adding new data, you wipe out any previous table or messages, to ensure you only see the latest search result.
             mainContainer.innerHTML=''
 
-            // 13. Handle "no data" cases. If the user inputs an invalid ticker symbol, the ticker exists but has no recent data, or there is a backend or network issue, it displays a friendly message instead of showing an empty table.
+            // 13. If there are no prices (meaning no data came back for that stock ticker), show a message on the page and stop running the rest of the code. Much better than showing an empty table.
+            // It’s not checking whether the user didn’t enter a ticker — it’s checking whether no data was returned for that ticker.
             if (!prices.length){ 
                 mainContainer.innerText='No data found for this ticker'
                 return
