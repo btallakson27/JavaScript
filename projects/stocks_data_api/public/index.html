@@ -110,8 +110,8 @@
             })
 
             // 18. Then you attach it all together here. 
-            thead.appendChild(headerRow) // “Attach the header row to the table’s header section.”
-            table.appendChild(thead) // “Attach the table header section to the full table.”
+            thead.appendChild(headerRow) // “take the thead containter and attach the first row that contains the text 'Date' and 'Close Price'. 
+            table.appendChild(thead) // “take the table element and attach the thead container to it. 
 
             // 19. At this point we have created the table header, which just sets up the column names. That part does not add the actual data.
             const tbody=document.createElement('tbody') //Now this next part is creating the body of the table, where the actual rows of data 
