@@ -56,7 +56,8 @@ app.post('/api', async (req,res)=>{
         res.status(200).send({prices:prices || []}) // in JavaScript, the primary purpose of return is to stop execution of the current function, so you don't want it here.
     }catch(err){
         console.error('Error in /api', err)
-        res.status(500).send({prices: []})
+        res.status(500).send({prices: []}) // you can include return here, but it's not required. The purpose of return would be to stop further code from running after sending a response,
+        // but in your catch block, this is the last line — nothing executes after it anyway.
     }
 })
 
