@@ -66,7 +66,8 @@ app.post('/api', async (req,res)=>{
 
 // 3. Create a quick test route.
 app.get('/test', (req,res)=>{
-    res.send('Server is running!') // why not console.log?
+    res.send('Server is running!') // why not console.log? // res.send sends a message back to the client’s browser (the frontend). So if you visit http://localhost:8383/test in a browser:
+    // With res.send() → you’ll see “Server is working!” in the browser page.
 })
 
 // 2. Set up app.listen so it actually runs.
