@@ -69,10 +69,8 @@
             console.log("Parsed JSON:", data)
                 
             const prices = Array.isArray(data?.prices) ? data.prices : []; 
-                // what you have is the wanted data which we called 'prices' on the backend, so let's call it the same thing here. not the 
-                // same as prices on the backend.
-                // This line creates a constant prices that safely checks whether data.prices exists and is an array. If it is, it assigns 
-                // that array to prices; otherwise, it assigns an empty array.
+                // the backend sends back this JSON. res.status(200).send({ prices: prices || [] })
+                // and you created the variable data above that contains this JSON info. So you are now checking if prices is actually in there.
                 console.log("Prices array length:", prices.length);
 
             // 12. Now you have useable data that's waiting to be processed for the user. 
