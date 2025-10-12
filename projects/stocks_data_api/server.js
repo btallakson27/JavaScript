@@ -13,7 +13,7 @@ app.use(express.static('public'))
 
 
 // 4. Now that the server is alive, we need to collect the data.
-async function scrapeData(ticker){
+async function scrapeData(ticker){ // WRONG you must include ticker as a parameter because the function needs to know which stock symbol (like “AAPL” or “TSLA”) to fetch data for.
     try{
         const range='1mo' //RANGE AND INTERVAL ABSOLUTELY MUST COME BEFORE YOU DEFINE THEM IN THE URL!!!
         const interval='1d'
@@ -27,9 +27,10 @@ async function scrapeData(ticker){
         const closes=result.indicators.quote[0].close
         const timestamps=result.timestamp
 
-        const formatted=closes.map((close,i)=>{ 
+        const formatted=closes.map((close,i)=>{ // ceach closes[i] corresponds to timestamp[i]. close represents the actual price at that index. and it knows that 
+            // close represents the actual price at that index because that’s what map() does — it automatically gives you each element from the array one by one as it loops through it. 
             const date=new Date(timestamps[i]*1000).toISOString().split('T')[0]
-            return close != null ? {date, close} : null
+            return close != null ? {date, close} : null // then for each one, you build an object. 
         }).filter(Boolean)
 
         return formatted
@@ -48,7 +49,7 @@ app.post('/api', async (req,res)=>{
     if (!ticker) return res.status(400).send({prices: []}) // here you do use return because you want to stop further execution of the 
     // route handler if no ticker is provided. WIthout return, the code would continue to try to call scrapeData(ticker) with undefined, which could cause errors.
 
-    try{ // build this whenever
+    try{ //GOT HUNG UP HERE. YOU OVERTHOUGHT IT. SINCE YOU MAKE THE FUNCTION ABOVE, THERE'S NOT MUCH TO DO HERE.
         const prices=await scrapeData(ticker) // This line does not guarantee that the result is an array AND IT MUST BE AN ARRAY OR THIS ENTIRE THING WON'T WORK!!! 
         console.log('Returning data for', ticker, prices.length, 'rows')
 
