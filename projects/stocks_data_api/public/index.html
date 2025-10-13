@@ -42,7 +42,8 @@
 
             // If user did not enter a stock ticker, show message and stop
             if (!stock_ticker) {
-                mainContainer.innerText = 'Please enter a stock ticker.'
+                mainContainer.innerText = 'Please enter a stock ticker.' // you could use innerHTML but innerTExt is safer when you're just inserting plain text.
+            // inner HTML would interpret tages and could cause issues if user input accidentally contains HTML.
                 return
             }
             // you can make the try-catch whenever you want, just don't forget!
@@ -79,15 +80,18 @@
 
             // 13. If there are no prices (meaning no data came back for that stock ticker), show a message on the page and stop running the rest of the code. Much better than showing an empty table.
             // It’s not checking whether the user didn’t enter a ticker — it’s checking whether no data was returned for that ticker.
+            // check if data was returned for the ticker input by user. can I move this above const res=await fetch('/api') above?
+            // No, you can’t move that above the fetch call. You don;t know whether there's data (prices) until AFTER you call the backend and get the response.
             if (!prices.length){ 
                 mainContainer.innerText='No data found for this ticker'
                 return
             }
             
-            // 14. Filter out bad entries. Removes any malformed or incomplete rows before display.
-            // != null means, "is not null or undefined.", so only clean, valid data goes to the table.
-            // so this line says, “Go through every stock price in prices, and only keep the ones that have both a date and a valid closing price.”
-            console.log("Building table, data looks like:", prices.slice(0, 3))
+            // filter prices to make sure only clean, valid data goes in the table. but why wouldn't they? what else could happen?
+            // possible issues include, Backend or API returned null or missing fields. Some entries have empty dates or prices due to a scrape error.
+            // JSON got partially corrupted. Different tickers might have different data formats. 
+            // So filtering ensures your frontend doesn’t crash or show blank rows if a backend entry looks like: { date: "", close: null }
+            //the bottom line, always filer entries when scraping data to prevent issues.
             const filteredPrices=prices.filter(entry => entry.date && entry.close != null) 
         
             // 15. Now we have the data ready to go, so we must create a table element. You’re building from the inside out!!! 
@@ -99,12 +103,13 @@
             const thead=document.createElement('thead')  // this is a container (a section) that holds header rows, not data rows. think of it like: <thead> ...header rows go here... </thead>
             const headerRow=document.createElement('tr') // this is the single row that contains your column labels — “Date” and “Close Price”.
             // So when you append headerRow to thead, you’re essentially saying: “Put this row of column names inside the header section of my table.”
+            // thead, th, tr, and td are core built-in HTML elements taht always exist in every browser. you can't just name them whatever you want.
 
             // 17. put the text in the top row of the table (headerRow)
             ['Date', 'Close Price'].forEach(text=>{ // loop over every string in the array... 
                 const th=document.createElement('th') // and for every string create a <th> element, not visible until appendid.
                 th.innerText=text // this is the single row that contains your column labels — “Date” and “Close Price”.
-                headerRow.appendChild(th) // set the visible text inside the <th>
+                headerRow.appendChild(th) // set the visible text inside the <th> // why doesn't th need quotes? because it's a variable, not a string. when you put it in quotes the first time, it becomes a variable.
             })
 
             // 18. Then you attach it all together here. 
@@ -124,11 +129,11 @@
                 const row=document.createElement('tr') // → creates a new table row
 
                 const dateCell=document.createElement('td') // → creates an empty cell element in memory for the date.
-                dateCell.innerText=entry.date // → puts the actual date string inside the cell.
+                dateCell.innerText=entry.date // → puts the actual date string inside the cell. you made a variable named dateCell not td, since td isn't defined anywhere. you never did td.innerText=entry.date
                 row.appendChild(dateCell) // → adds the date cell to the row.
 
-                const closeCell = document.createElement('td') //→ creates a cell for the closing price.
-                    closeCell.innerText = `$${entry.close.toFixed(2)}` // → fills the price nicely formatted.
+                const closeCell = document.createElement('td') //→ creates a cell for the closing price. why is this also td? Because <td> stands for table data cell, and every table row (<tr>) contains one or more <td> cells.
+                    closeCell.innerText = `$${entry.close.toFixed(2)}` // → fills the price nicely formatted to show only 2 decimal places.
                     row.appendChild(closeCell) // → adds the close price cell to the row.
                     tbody.appendChild(row) // → adds the completed row to the table body.
             })
