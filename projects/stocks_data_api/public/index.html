@@ -81,7 +81,7 @@
     function buildTable(prices) {
       mainContainer.innerHTML = '';
 
-      if (!Array.isArray(prices) || !prices.length) {
+      if (!Array.isArray(prices) || !prices.length) { //NEW
         mainContainer.innerText = 'No data found for this ticker';
         return;
       }
