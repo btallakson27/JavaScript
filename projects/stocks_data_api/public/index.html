@@ -52,9 +52,14 @@
         if (!res.ok) throw new Error(`Server responded with status ${res.status}`);
 
         // makes your frontend bulletproof. NEW
-        const contentType = res.headers.get('content-type'); // Get the value of the 'Content-Type' header from the server's response. This tells you what kind of data the server is sending back (e.g., JSON, HTML, plain text).
-        if (!contentType || !contentType.includes('application/json')) { // If there’s no Content-Type header, OR it exists but doesn’t specify JSON format...
-          throw new Error(`Unexpected response type: ${contentType}`); // ...then stop the function by throwing an error. Include the actual Content-Type value in the error message to help debug what the server really sent.
+        const contentType = res.headers.get('content-type'); 
+        // Get the value of the 'Content-Type' header from the server's response. 
+        // This tells you what kind of data the server is sending back (e.g., JSON, HTML, plain text).
+        if (!contentType || !contentType.includes('application/json')) { 
+          // If there’s no Content-Type header, OR it exists but doesn’t specify JSON format...
+          throw new Error(`Unexpected response type: ${contentType}`); 
+          // ...then stop the function by throwing an error. 
+          // Include the actual Content-Type value in the error message to help debug what the server really sent.
         }
 
         const data = await res.json();
