@@ -29,7 +29,7 @@
         // Document Object Model. When your browser loads an HTML page, it doesn’t just display the text — it builds a structured tree 
         // in memory that represents every part of that page. That tree is called the DOM. A DOM element is an object that JavaScript can accees and modify.
         const tickerInput=document.getElementById('ticker')
-        const searchBtn=document.querySelector('searchBtn')
+        const searchBtn=document.getElementById('searchBtn')
         const mainContainer=document.querySelector('main')
 
         // 9. Create the main function. This is where the frontend will, get the user's input, send it to the backend, display the returned data.
@@ -48,7 +48,9 @@
             }
             // you can make the try-catch whenever you want, just don't forget!
             try{
-                console.log("Sending request with:", { stock_ticker })
+                console.log("fetchStockData() called"); // debugging log. if this prints, it means, “Yes, the code reached this point in the function.”
+                console.log("Sending request with:", { stock_ticker }); // debugging
+    
                 // 10. Make the API call (frontend → backend). This line connects the frontend to your backend route from earlier.
             // When the user clicks “Search,” this sends their ticker to /api, and waits for the backend’s response.
             // You now have full client-server communication.
@@ -57,15 +59,21 @@
                 headers: {'Content-Type': 'application/json'}, // application must be singular
                 body: JSON.stringify({stock_ticker})
             })
-            console.log("Response received:", res)
+            console.log("Response received:", res) // debugging log. 
+            console.log("res.ok:", res.ok, "status:", res.status); // debugging
 
             if (!res.ok){ // literally means “the response is not OK.”
                 throw new Error(`Server responded with status ${res.status}`) // this line is a manual error check after making a fetch request.
                 // “If the server didn’t respond with a success code (200–299), treat it as an error and stop here.”
             }
 
+            // makes your frontend bulletproof. NEW
+            const contentType = res.headers.get('content-type'); 
+            if (!contentType || !contentType.includes('application/json')) {
+            throw new Error(`Unexpected response type: ${contentType}`)
+            }
+
             // 11. Once you get the response, parse JSON response, and extract prices array safely.
-            console.log("About to parse JSON")
             const data=await res.json() // turns the backend’s JSON response (e.g. {"prices":[...]}) into a JavaScript object so you can work with it in JS.
             console.log("Parsed JSON:", data)
                 
@@ -73,10 +81,6 @@
                 // the backend sends back this JSON. res.status(200).send({ prices: prices || [] })
                 // and you created the variable data above that contains this JSON info. So you are now checking if prices is actually in there.
                 console.log("Prices array length:", prices.length);
-
-            // 12. Now you have useable data that's waiting to be processed for the user. 
-            // Before adding new data, you wipe out any previous table or messages, to ensure you only see the latest search result.
-            mainContainer.innerHTML=''
 
             // 13. If there are no prices (meaning no data came back for that stock ticker), show a message on the page and stop running the rest of the code. Much better than showing an empty table.
             // It’s not checking whether the user didn’t enter a ticker — it’s checking whether no data was returned for that ticker.
@@ -86,67 +90,57 @@
                 mainContainer.innerText='No data found for this ticker'
                 return
             }
-            
-            // filter prices to make sure only clean, valid data goes in the table. but why wouldn't they? what else could happen?
-            // possible issues include, Backend or API returned null or missing fields. Some entries have empty dates or prices due to a scrape error.
-            // JSON got partially corrupted. Different tickers might have different data formats. 
-            // So filtering ensures your frontend doesn’t crash or show blank rows if a backend entry looks like: { date: "", close: null }
-            //the bottom line, always filer entries when scraping data to prevent issues.
-            const filteredPrices=prices.filter(entry => entry.date && entry.close != null) 
-        
-            // 15. Now we have the data ready to go, so we must create a table element. You’re building from the inside out!!! 
-            // The reason you create the <table> dynamically in JavaScript instead of writing it directly in HTML is
-            // because the data (and number of rows) depends on what the user searches for. A static table in HTML can’t easily adjust to user input.
-            const table=document.createElement('table') 
-        
-            // 16. Build the header row.
-            const thead=document.createElement('thead')  // this is a container (a section) that holds header rows, not data rows. think of it like: <thead> ...header rows go here... </thead>
-            const headerRow=document.createElement('tr') // this is the single row that contains your column labels — “Date” and “Close Price”.
-            // So when you append headerRow to thead, you’re essentially saying: “Put this row of column names inside the header section of my table.”
-            // thead, th, tr, and td are core built-in HTML elements taht always exist in every browser. you can't just name them whatever you want.
 
-            // 17. put the text in the top row of the table (headerRow)
-            ['Date', 'Close Price'].forEach(text=>{ // loop over every string in the array... 
-                const th=document.createElement('th') // and for every string create a <th> element, not visible until appendid.
-                th.innerText=text // this is the single row that contains your column labels — “Date” and “Close Price”.
-                headerRow.appendChild(th) // set the visible text inside the <th> // why doesn't th need quotes? because it's a variable, not a string. when you put it in quotes the first time, it becomes a variable.
-            })
-
-            // 18. Then you attach it all together here. 
-            thead.appendChild(headerRow) // “take the thead containter and attach the first row that contains the text 'Date' and 'Close Price'. 
-            table.appendChild(thead) // “take the table element and attach the thead container to it. 
-
-            // 19. At this point we have created the table header, which just sets up the column names. That part does not add the actual data.
-            const tbody=document.createElement('tbody') //Now this next part is creating the body of the table, where the actual rows of data 
-            // will live. tbody is separate from thead, and HTML tables are usually structured as:
-                // <table>
-                //   <thead>...</thead>
-                //   <tbody>...</tbody>
-                // </table>
-            // Without a tbody, your table won’t have rows of actual data — just the header.
-                console.log(data)
-            filteredPrices.forEach(entry => { // filteredPrices contains all vaild data.
-                const row=document.createElement('tr') // → creates a new table row
-
-                const dateCell=document.createElement('td') // → creates an empty cell element in memory for the date.
-                dateCell.innerText=entry.date // → puts the actual date string inside the cell. you made a variable named dateCell not td, since td isn't defined anywhere. you never did td.innerText=entry.date
-                row.appendChild(dateCell) // → adds the date cell to the row.
-
-                const closeCell = document.createElement('td') //→ creates a cell for the closing price. why is this also td? Because <td> stands for table data cell, and every table row (<tr>) contains one or more <td> cells.
-                    closeCell.innerText = `$${entry.close.toFixed(2)}` // → fills the price nicely formatted to show only 2 decimal places.
-                    row.appendChild(closeCell) // → adds the close price cell to the row.
-                    tbody.appendChild(row) // → adds the completed row to the table body.
-            })
-
-            // 20. Attach everything to the DOM. Once the table is fully built, it’s inserted into the <main> area of your HTML.
-            // This will finally show the table in the browser. 
-            table.appendChild(tbody)
-            mainContainer.appendChild(table)
-            }catch(err){ // Handle fetch or parsing errors gracefully
-                console.error('Error fetching stock data:', err.message) //there is a problem happening here!
-                mainContainer.innerText='Error fetching stock data. Please try again'
-            }     
+            // ✅ Build and show the table
+            buildTable(prices); //NEW
+            } catch (err) {
+            console.error("Error fetching stock data:", err);
+            mainContainer.innerText = 'Error fetching stock data. Please try again.';
+          }
         }
+            // Helper function to build the stock table
+    function buildTable(prices) {
+      mainContainer.innerHTML = '';
+
+      if (!Array.isArray(prices) || !prices.length) {
+        mainContainer.innerText = 'No data found for this ticker';
+        return;
+      }
+
+      const filteredPrices = prices.filter(entry => entry.date && entry.close != null);
+      console.log("Filtered prices length:", filteredPrices.length);
+
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+
+      ['Date', 'Close Price'].forEach(text => {
+        const th = document.createElement('th');
+        th.innerText = text;
+        headerRow.appendChild(th);
+      });
+
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement('tbody');
+      filteredPrices.forEach(entry => {
+        const row = document.createElement('tr');
+
+        const dateCell = document.createElement('td');
+        dateCell.innerText = entry.date;
+
+        const closeCell = document.createElement('td');
+        closeCell.innerText = `$${entry.close.toFixed(2)}`;
+
+        row.appendChild(dateCell);
+        row.appendChild(closeCell);
+        tbody.appendChild(row);
+      });
+
+      table.appendChild(tbody);
+      mainContainer.appendChild(table);
+    }
         // Add event listener: run fetchStockData() when button is clicked
         sendBtn.addEventListener('click', fetchStockData)
     </script>
