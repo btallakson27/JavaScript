@@ -1,104 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Data Web Scraper</title>
-    <!--7. Do a bit of styling-->
-    <style>
-        body { padding: 20px; font-family: sans-serif; background: rgb(163, 187, 163); }
-        header { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        main {display: flex; justify-content: center;}
-        input { flex: 0.1; padding: 8px; border-radius: 6px; border: 1px solid black; }
-        button { padding: 8px 12px; border-radius: 6px; cursor: pointer; }
-        table { width: 30%; border-collapse: collapse; margin-top: 20px; background: white; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background: #f0f0f0; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Data Web Scraper</title>
+  <style>
+    body { padding: 20px; font-family: sans-serif; background: rgb(163, 187, 163); }
+    header { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+    main { display: flex; justify-content: center; }
+    input { flex: 0.1; padding: 8px; border-radius: 6px; border: 1px solid black; }
+    button { padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+    table { width: 30%; border-collapse: collapse; margin-top: 20px; background: white; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f0f0f0; }
+  </style>
 </head>
 <body>
-   <!--6. Now that your backend works, you design what the user sees. You Start with this.-->
-    <header>
-        <input id="ticker" placeholder="Enter stock ticker..."/> <!--why do we need an ID if it's the only input bar? You don't, but it's
-        just a good habit to develop for clearer DOM access, it prevents it from breaking if you end up adding another input later-->
-        <button id="searchBtn">Search</button>
-    </header>
-    <main></main>
-    <script>
-        // 8. Here you start to make the data visible to the user. Now you make the frontend interactive. Grab DOM elements.
-        // Document Object Model. When your browser loads an HTML page, it doesn’t just display the text — it builds a structured tree 
-        // in memory that represents every part of that page. That tree is called the DOM. A DOM element is an object that JavaScript can accees and modify.
-        const tickerInput=document.getElementById('ticker')
-        const searchBtn=document.getElementById('searchBtn')
-        const mainContainer=document.querySelector('main')
+  <header>
+    <input id="ticker" placeholder="Enter stock ticker..." />
+    <button id="searchBtn">Search</button>
+  </header>
+  <main></main>
 
-        // 9. Create the main function. This is where the frontend will, get the user's input, send it to the backend, display the returned data.
-        async function fetchStockData(){
-                // you don't want these lines in your try-catch block because you validate user input before making any network call.
-                // If it’s empty, you stop execution early (return). The try block only runs if you actually have a ticker worth fetching.
-                // That’s exactly how you want it — it avoids wasting time making a useless API call.
-                // very first thing you want to check before sending stock_ticker to backend is make sure there are no extra blank spaces
-            const stock_ticker=tickerInput.value.trim() // .trim() is a string method that remoes any extra spaces from the beginning and end of a string.
+  <script>
+    // Grab DOM elements
+    const tickerInput = document.getElementById('ticker');
+    const searchBtn = document.getElementById('searchBtn');
+    const mainContainer = document.querySelector('main');
 
-            // If user did not enter a stock ticker, show message and stop
-            if (!stock_ticker) {
-                mainContainer.innerText = 'Please enter a stock ticker.' // you could use innerHTML but innerTExt is safer when you're just inserting plain text.
-            // inner HTML would interpret tages and could cause issues if user input accidentally contains HTML.
-                return
-            }
-            // you can make the try-catch whenever you want, just don't forget!
-            try{
-                console.log("fetchStockData() called"); // debugging log. if this prints, it means, “Yes, the code reached this point in the function.”
-                console.log("Sending request with:", { stock_ticker }); // debugging
-    
-                // 10. Make the API call (frontend → backend). This line connects the frontend to your backend route from earlier.
-            // When the user clicks “Search,” this sends their ticker to /api, and waits for the backend’s response.
-            // You now have full client-server communication.
-            const res=await fetch('/api',{ // here you are sending a network call (an API call). fetch always goes in a try/catch block.
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'}, // application must be singular
-                body: JSON.stringify({stock_ticker})
-            })
-            console.log("Response received:", res) // debugging log. 
-            console.log("res.ok:", res.ok, "status:", res.status); // debugging
+    // Main function to fetch and display stock data
+    async function fetchStockData() {
+      const stock_ticker = tickerInput.value.trim();
 
-            if (!res.ok){ // literally means “the response is not OK.”
-                throw new Error(`Server responded with status ${res.status}`) // this line is a manual error check after making a fetch request.
-                // “If the server didn’t respond with a success code (200–299), treat it as an error and stop here.”
-            }
+      if (!stock_ticker) {
+        mainContainer.innerText = 'Please enter a stock ticker.';
+        return;
+      }
 
-            // makes your frontend bulletproof. NEW
-            const contentType = res.headers.get('content-type'); 
-            if (!contentType || !contentType.includes('application/json')) {
-            throw new Error(`Unexpected response type: ${contentType}`)
-            }
+      try {
+        console.log("fetchStockData() called"); // debugging log. if this prints, it means, “Yes, the code reached this point in the function.”
+        console.log("Sending request with:", { stock_ticker }); // debugging log.
+        const res = await fetch('/api', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ stock_ticker })
+        });
 
-            // 11. Once you get the response, parse JSON response, and extract prices array safely.
-            const data=await res.json() // turns the backend’s JSON response (e.g. {"prices":[...]}) into a JavaScript object so you can work with it in JS.
-            console.log("Parsed JSON:", data)
-                
-            const prices = Array.isArray(data?.prices) ? data.prices : []; 
-                // the backend sends back this JSON. res.status(200).send({ prices: prices || [] })
-                // and you created the variable data above that contains this JSON info. So you are now checking if prices is actually in there.
-                console.log("Prices array length:", prices.length);
+        console.log("Response received:", res); // debugging log. 
+        console.log("res.ok:", res.ok, "status:", res.status); // debugging log. 
 
-            // 13. If there are no prices (meaning no data came back for that stock ticker), show a message on the page and stop running the rest of the code. Much better than showing an empty table.
-            // It’s not checking whether the user didn’t enter a ticker — it’s checking whether no data was returned for that ticker.
-            // check if data was returned for the ticker input by user. can I move this above const res=await fetch('/api') above?
-            // No, you can’t move that above the fetch call. You don;t know whether there's data (prices) until AFTER you call the backend and get the response.
-            if (!prices.length){ 
-                mainContainer.innerText='No data found for this ticker'
-                return
-            }
+        if (!res.ok) throw new Error(`Server responded with status ${res.status}`);
 
-            // ✅ Build and show the table
-            buildTable(prices); //NEW
-            } catch (err) {
-            console.error("Error fetching stock data:", err);
-            mainContainer.innerText = 'Error fetching stock data. Please try again.';
-          }
+        // makes your frontend bulletproof. NEW
+        const contentType = res.headers.get('content-type'); 
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error(`Unexpected response type: ${contentType}`);
         }
-            // Helper function to build the stock table
+
+        const data = await res.json();
+        console.log("Parsed JSON:", data);
+
+        const prices = Array.isArray(data?.prices) ? data.prices : [];
+        console.log("Prices array length:", prices.length);
+
+        if (!prices.length) {
+          mainContainer.innerText = 'No data found for this ticker';
+          return;
+        }
+
+        // ✅ Build and show the table
+        buildTable(prices); //NEW
+
+      } catch (err) {
+        console.error("Error fetching stock data:", err);
+        mainContainer.innerText = 'Error fetching stock data. Please try again.';
+      }
+    }
+
+    // Helper function to build the stock table
     function buildTable(prices) {
       mainContainer.innerHTML = '';
 
@@ -141,9 +120,9 @@
       table.appendChild(tbody);
       mainContainer.appendChild(table);
     }
-        // Add event listener: run fetchStockData() when button is clicked
-        sendBtn.addEventListener('click', fetchStockData)
-    </script>
+
+    // Add click event listener to button
+    searchBtn.addEventListener('click', fetchStockData);
+  </script>
 </body>
 </html>
-
