@@ -49,7 +49,7 @@
         console.log("Response received:", res); // debugging log. 
         console.log("res.ok:", res.ok, "status:", res.status); // debugging log. 
 
-        if (!res.ok) throw new Error(`Server responded with status ${res.status}`);
+        if (!res.ok) throw new Error(`Server responded with status ${res.status}`); //why not return?
 
         // makes your frontend bulletproof. NEW
         const contentType = res.headers.get('content-type'); 
