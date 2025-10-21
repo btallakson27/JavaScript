@@ -19,7 +19,13 @@ async function scrapeData(ticker){ // WRONG you must include ticker as a paramet
         const interval='1d'
         const url=`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=${range}&interval=${interval}` 
         // you can do this part before or after building the table in the frontend. up to you.
-        const res=await fetch(url)
+        const res = await fetch(url, { // needed to deploy because of Yahoo Finance API restrictions. if this wasn't an issue you could just run const res=await fetch(url)
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+            'Accept': 'application/json,text/plain,*/*'
+          }
+        });
+        
         const data=await res.json()
         if (!data.chart || !data.chart.result) return []
 
