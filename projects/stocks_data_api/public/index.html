@@ -5,20 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stock Data Web Scraper</title>
   <style>
-    body { padding: 20px; font-family: sans-serif; background: rgb(163, 187, 163); }
-    header { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+    body { padding: 20px; font-family: sans-serif; background: linear-gradient( #f2f3f2, #9fc0a1); background-attachment: fixed; }
+    header { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px;  }
     main { display: flex; justify-content: center; }
     input { flex: 0.1; padding: 8px; border-radius: 6px; border: 1px solid black; }
     button { padding: 8px 12px; border-radius: 6px; cursor: pointer; }
     table { width: 30%; border-collapse: collapse; margin-top: 20px; background: white; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
     th { background: #f0f0f0; }
+
+    @media (min-width: 640px){
+      table{
+        width: 70%;
+      }
+    }
   </style>
 </head>
 <body>
   <header>
-    <input id="ticker" placeholder="Enter stock ticker..." />
-    <button id="searchBtn">Search</button>
+    <div>
+      <h1>Stock Data Prices</h1>
+    </div>
+    <div>
+      <input id="ticker" placeholder="Enter stock ticker..." />
+      <button id="searchBtn">Search</button>
+    </div>
   </header>
   <main></main>
 
