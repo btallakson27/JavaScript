@@ -33,9 +33,12 @@ async function scrapeData(ticker){ // WRONG you must include ticker as a paramet
         const closes=result.indicators.quote[0].close
         const timestamps=result.timestamp
 
-        const formatted=closes.map((close,i)=>{ // ceach closes[i] corresponds to timestamp[i]. close represents the actual price at that index. and it knows that 
-            // close represents the actual price at that index because that’s what map() does — it automatically gives you each element from the array one by one as it loops through it. 
-            const date=new Date(timestamps[i]*1000).toISOString().split('T')[0]
+        const formatted=closes.map((close,i)=>{ // each closes[i] corresponds to timestamp[i]. close represents the actual price at that index. and it knows that 
+          const date = new Date(timestamps[i] * 1000).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+                })
             return close != null ? {date, close} : null // then for each one, you build an object. 
         }).filter(Boolean)
 
